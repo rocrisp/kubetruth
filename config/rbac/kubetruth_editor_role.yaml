@@ -1,0 +1,31 @@
+# permissions for end users to edit kubetruths.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: kubetruth-editor-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: kubetruth-operator
+    app.kubernetes.io/part-of: kubetruth-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: kubetruth-editor-role
+rules:
+- apiGroups:
+  - apps.cloudtruth.com
+  resources:
+  - kubetruths
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apps.cloudtruth.com
+  resources:
+  - kubetruths/status
+  verbs:
+  - get

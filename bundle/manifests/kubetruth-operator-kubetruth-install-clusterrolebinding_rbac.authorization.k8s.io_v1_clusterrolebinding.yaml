@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  creationTimestamp: null
+  name: kubetruth-operator-kubetruth-install-clusterrolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kubetruth-operator-kubetruth-install-clusterrole
+subjects:
+- kind: ServiceAccount
+  name: kubetruth-install
+  namespace: system

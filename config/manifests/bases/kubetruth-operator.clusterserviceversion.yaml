@@ -1,0 +1,42 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: '[]'
+    capabilities: Basic Install
+  name: kubetruth-operator.v0.0.0
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions: {}
+  description: store secrets and configmaps
+  displayName: kubetruth
+  icon:
+  - base64data: ""
+    mediatype: ""
+  install:
+    spec:
+      deployments: null
+    strategy: ""
+  installModes:
+  - supported: false
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - kubetruth
+  - helm operator
+  links:
+  - name: Kubetruth Operator
+    url: https://kubetruth-operator.domain
+  maintainers:
+  - email: kubetruth@email.com
+    name: kubetruth
+  maturity: alpha
+  provider:
+    name: kubetruth
+  version: 0.0.0

@@ -1,0 +1,7 @@
+apiVersion: v2
+appVersion: 1.2.2
+description: The CloudTruth integration for kubernetes that pushes parameter updates
+  into kubernetes config maps and secrets
+name: kubetruth
+type: application
+version: 1.2.2

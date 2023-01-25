@@ -1,0 +1,6 @@
+# Use the 'create api' subcommand to add watches to this file.
+- group: apps.cloudtruth.com
+  version: v1alpha1
+  kind: KubeTruth
+  chart: helm-charts/kubetruth
+#+kubebuilder:scaffold:watch
