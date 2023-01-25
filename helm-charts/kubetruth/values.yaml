@@ -21,26 +21,7 @@ serviceAccount:
   annotations: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
-  name: ""
-
-rbac:
-  # Specifies whether RBAC resources should be created
-  create: true
-  clusterInstall: true
-  roleRules:
-    - apiGroups: [ "" ]
-      resources: [ "configmaps" ]
-      verbs: [ "*" ]
-    - apiGroups: [ "" ]
-      resources: [ "secrets" ]
-      verbs: [ "*" ]
-    - apiGroups: [ "" ]
-      resources: [ "namespaces" ]
-      verbs: [ "get", "list", "create" ]
-    - apiGroups: [ "kubetruth.cloudtruth.com" ]
-      resources: [ "projectmappings" ]
-      verbs: [ "*" ]
-  additionalRoleRules: []
+  name: "kubetruth-install"
 
 podAnnotations: {}
 
