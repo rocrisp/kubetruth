@@ -72,7 +72,7 @@ metadata:
     capabilities: Basic Install
     operators.operatorframework.io/builder: operator-sdk-v1.25.2
     operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
-  name: kubetruth-operator.v0.0.6
+  name: kubetruth-operator.v0.0.8
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -132,7 +132,7 @@ spec:
           verbs:
           - use
         serviceAccountName: kubetruth-install
-      permissions:
+      clusterPermissions:
       - rules:
         - apiGroups:
           - ""
@@ -281,7 +281,7 @@ spec:
                 - --metrics-bind-address=127.0.0.1:8080
                 - --leader-elect
                 - --leader-election-id=kubetruth-operator
-                image: quay.io/rocrisp/kubetruth-operator:v0.0.6
+                image: quay.io/rocrisp/kubetruth-operator:v0.0.8
                 livenessProbe:
                   httpGet:
                     path: /healthz
@@ -367,4 +367,4 @@ spec:
   maturity: alpha
   provider:
     name: kubetruth
-  version: 0.0.6
+  version: 0.0.8
