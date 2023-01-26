@@ -79,5 +79,17 @@ rules:
   - patch
   - update
   - watch
+- apiGroups:
+  - kubetruth.cloudtruth.com
+  resources:
+  - projectmappings
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
 
 #+kubebuilder:scaffold:rules

@@ -1,0 +1,85 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: projectmappings.kubetruth.cloudtruth.com
+spec:
+  group: kubetruth.cloudtruth.com
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                scope:
+                  type: string
+                  description: Root or override scope, there can only be one root scope
+                  enum: ["root", "override"]
+                  default: "override"
+                project_selector:
+                  type: string
+                  description: A regexp to limit the projects acted against
+                key_selector:
+                  type: string
+                  description: A regexp to limit the keys acted against
+                environment:
+                  type: string
+                  description: A environment to use to determine parameter values
+                tag:
+                  type: string
+                  description: The version tag used when querying for parameters
+                skip:
+                  type: boolean
+                  description: Skips the generation of resources for the selected projects
+                suppress_namespace_inheritance:
+                  type: boolean
+                  description: Prevents the CRD from the primary namespace from being inherited by secondary namespaces
+                log_level:
+                  type: string
+                  description: The level of logging to use
+                  enum: ["debug", "info", "warn", "error", "fatal"]
+                included_projects:
+                  type: array
+                  items:
+                    type: string
+                  description: Include the parameters from other projects into the selected ones.  This can be recursive in a depth first fashion, so if A imports B and B imports C, then A will get B's and C's parameters.  For key conflicts, if A includes B and B includes C, then the precendence is A overrides B overrides C.  If A includes [B, C], then the precendence is A overrides C overrides B.
+                context:
+                  type: object
+                  additionalProperties: true
+                  description: Context variables that can be used by templates.  The values can also be templates
+                active_templates:
+                  type: array
+                  nullable: true
+                  items:
+                    type: string
+                  description: Selects the templates that should be active, includes all templates when nil, none when empty
+                resource_templates:
+                  type: object
+                  additionalProperties:
+                    type: string
+                  description: The templates to use in generating kubernetes resources
+              required:
+                - scope
+      additionalPrinterColumns:
+        - name: Scope
+          type: string
+          description: The scope of the project mapping
+          jsonPath: .spec.scope
+        - name: Project
+          type: string
+          description: The selector used to target configuration by project
+          jsonPath: .spec.project_selector
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+  scope: Namespaced
+  names:
+    plural: projectmappings
+    singular: projectmapping
+    kind: ProjectMapping
+    shortNames:
+      - pm
