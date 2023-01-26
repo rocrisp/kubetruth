@@ -1,4 +1,4 @@
-oc new-namespace kubetruth-operator-system
+oc new-project kubetruth-operator-system
 
 operator-sdk run bundle quay.io/rocrisp/kubetruth-operator-bundle:v0.1.0
 
