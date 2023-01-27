@@ -65,7 +65,7 @@ oc adm policy add-scc-to-user anyuid -z kubetruth-install
 oc get pod kubetruth-install-777d7d8745-l4d7q -oyaml | grep scc
     openshift.io/scc: anyuid
 ````
-6. Examine runAsUser. Nothing in return means there's no restriction on who runs the pod.
+1. Examine runAsUser. Should return nothing. This means that there's no restriction on who can run the pod.
    ````
    oc get pod kubetruth-install-777d7d8745-l4d7q -oyaml | grep runAsUser
 
