@@ -168,15 +168,15 @@ make bundle-build bundle-push
 
 Create the namespace
 
-    ````
+    
     oc new-project kubetruth-operator-system
-    ```
+    
     
 12.   Deploy the operator using Operator SDK intergration with OLM
    
-    ```
+    
     operator-sdk run bundle quay.io/rocrisp/kubetruth-operator-bundle:v0.1.0
-    ```
+    
 1.  As the last step, we deploy the operand.
 ````
 oc apply -f config/samples/apps_v1alpha1_kubetruth.yaml
