@@ -59,7 +59,7 @@ oc adm policy add-scc-to-user anyuid -z kubetruth-install
 
 3. Delete the offending pod and you should see a new pod spins up automatically.
 
-Examine the pod and it should be running now.
+4. Examine the pod and it should be running now.
 
 ### Now that we have the Operator running, we can use it to build a Helm-based Operator using the Operator SDK framework.
 
