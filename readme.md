@@ -78,11 +78,20 @@ oc get pod kubetruth-install-777d7d8745-l4d7q -oyaml | grep scc
 
 #### A few things to consider
 
-1. The Operator already has a CRD so we will create a new Kind with a different name.
+1. The Operator already have a custom Kind associated with the Ruby Operator, so we will create a new Kind with a different name.
    
-2. We need to move the rbac from template/ to the config/rback directory
+2. We need to extract the following from the helm charts and move them into the config/rback directory
+   * templates/clusterrole.yaml
+   * templates/clusterrolebinding.yaml
+   * templates/rolebinding.yaml
+   * templates/serviceaccount.yaml
+
+3. We need to extract the following from the helm charts and move it into the config/manifests/base directory
+   * crds/projectmapping.yaml
    
-3. We need to add SCC Pod permission using anyuid.
+4. We need to add SCC anyuid to the serviceaccount.
+
+5. We want to remove [this section](https://github.com/cloudtruth/kubetruth/blob/main/helm/kubetruth/templates/_helpers.tpl#L53-L62) of the helpers. 
 
 ### Let's begin by creatinig a Helm-based operator.
 
