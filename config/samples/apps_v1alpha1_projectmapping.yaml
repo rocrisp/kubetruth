@@ -1,0 +1,6 @@
+apiVersion: kubetruth.cloudtruth.com
+kind: ProjectMapping
+metadata:
+  name: projectmapping-sample
+spec:
+  environment : default
