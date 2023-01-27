@@ -118,78 +118,76 @@ operator-sdk create api \
 ````
 1. Rbac and serviceAccount will be handled by OLM so we need to remove the following :
     
-    Remove rbac contents from helm-charts/kubetruth/values.yaml 
+    1. Extract rbac contents from helm-charts/kubetruth/values.yaml and add them to config/rbac/role.yaml. [See Example](https://github.com/rocrisp/kubetruth/blob/main/config/rbac/role.yaml)
    
-    Remove serviceAccount contents from helm-charts/kubetruth/values.yaml.
+    2. Remove serviceAccount contents from helm-charts/kubetruth/values.yaml.
    
-   [See here](https://github.com/rocrisp/kubetruth/blob/main/helm-charts/kubetruth/values.yaml) 
+    [See example](https://github.com/rocrisp/kubetruth/blob/main/helm-charts/kubetruth/values.yaml) 
    
-   Extract clusterrole.yaml, clusterrolebinding.yaml, role.yaml, rolebinding.yaml, and serviceaccount.yaml from helm-charts/kubetruth/templates dir [see result](https://github.com/rocrisp/kubetruth/tree/main/helm-charts/kubetruth/templates)
+    3. Remove clusterrole.yaml, clusterrolebinding.yaml, role.yaml, rolebinding.yaml, and serviceaccount.yaml from helm-charts/kubetruth/templates dir [See example](https://github.com/rocrisp/kubetruth/tree/main/helm-charts/kubetruth/templates)
    
-   Create serviceaccount.yaml, clusterrole.yaml, and clusterrolebinding.yaml in the config/rbac/ subdir [see here](https://github.com/rocrisp/kubetruth/tree/main/config/rbac)
+    4. Create serviceaccount.yaml, clusterrole.yaml, and clusterrolebinding.yaml in the config/rbac/ subdir [See example](https://github.com/rocrisp/kubetruth/tree/main/config/rbac)
 
-   Modify config/rbac/kustomization.yaml to include the files just created. [see here](https://github.com/rocrisp/kubetruth/blob/main/config/rbac/kustomization.yaml#L20)
+    5. Modify config/rbac/kustomization.yaml to include the files created in (iv). [See example](https://github.com/rocrisp/kubetruth/blob/main/config/rbac/kustomization.yaml#L20)
 
-   Notice the clusterrole with the SCC with anyuid allows anyuid to access the container in the pod [see here](https://github.com/rocrisp/kubetruth/blob/main/config/rbac/kubetruth_install_clusterrole.yaml#L41)
+    Note: Notice the clusterrole defines SCC with anyuid which allows anyuid to access the container in the pod [See example](https://github.com/rocrisp/kubetruth/blob/main/config/rbac/kubetruth_install_clusterrole.yaml#L41)
 
-2. Update serviceAccountName in helm-charts/kubetruth/templates/deployment.yaml to "kubetruth-operator-kubetruth-install" [see here](https://github.com/rocrisp/kubetruth/blob/main/helm-charts/kubetruth/templates/deployment.yaml#L27)
-3. Integrate with OLM to make delivering software very easy. 
+2.  Move projectmapping.yaml from helm-chart/kubetruth/crd/ directory to config/crd/bases/projectmapping.yaml.[See example](https://github.com/rocrisp/kubetruth/tree/main/config/crd/bases)
+3.  Modify config/crd/kustomization.yaml to include projectmapping.yaml. [See example](https://github.com/rocrisp/kubetruth/blob/main/config/crd/kustomization.yaml#L6)
+4.  Add a sample cr for kind: ProjectMapping. [See example](https://github.com/rocrisp/kubetruth/blob/main/config/samples/apps_v1alpha1_projectmapping.yaml)
+5. Update serviceAccountName in helm-charts/kubetruth/templates/deployment.yaml to "kubetruth-operator-kubetruth-install" [See example](https://github.com/rocrisp/kubetruth/blob/main/helm-charts/kubetruth/templates/deployment.yaml#L27)
+6. Integrate with OLM to make delivering software very easy. 
 
-   1. We have an extra serviceaccount.
-   
-        Add the extra serviceaccount to OLM by adding an extra flag --extra-servive-accounts to the Makefile [see doc](https://sdk.operatorframework.io/docs/advanced-topics/multi-sa/).
+   1. Add the extra serviceaccount to OLM by adding an extra flag --extra-servive-accounts to the Makefile [see doc](https://sdk.operatorframework.io/docs/advanced-topics/multi-sa/).
         
-        Should look like [this](https://github.com/rocrisp/kubetruth/blob/main/Makefile#L157)
-
-   2. Generate files in bundle format Example, search for ["make bundle"](https://sdk.operatorframework.io/docs/olm-integration/generation/)
+        [See example](https://github.com/rocrisp/kubetruth/blob/main/Makefile#L157)
    
-        ````
-        make bundle
-        ````
-   See the directory created by the command [here](https://github.com/rocrisp/kubetruth/tree/main/bundle)
+   2. Makefile depends on environment variables. To make things easier use setenv.sh. [See example](https://github.com/rocrisp/kubetruth/blob/main/setenv.sh)
+   3.  Modify and execute setenv.sh with
+    ````
+    source setenv.sh
+    ````
 
-   The manifests directory holds all the generated files from [config/](https://github.com/rocrisp/kubetruth/tree/main/config)
-4.  Move projectmapping.yaml from helm-chart/kubetruth/crd/ directory to config/crd/bases/projectmapping.yaml.[See here](https://github.com/rocrisp/kubetruth/tree/main/config/crd/bases)
-5.  Modify config/crd/kustomization.yaml to include projectmapping.yaml. [See here](https://github.com/rocrisp/kubetruth/blob/main/config/crd/kustomization.yaml#L6)
-6.  Add a sample cr for kind: ProjectMapping. [See here](https://github.com/rocrisp/kubetruth/blob/main/config/samples/apps_v1alpha1_projectmapping.yaml)
-7.  The rbac permission from [here](https://github.com/cloudtruth/kubetruth/blob/981d3719a4e1ab6c70e9f8e6c41ed21da06d3acb/helm/kubetruth/values.yaml#L26) is added to csv [here](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator.clusterserviceversion.yaml#L95) and [here](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator.clusterserviceversion.yaml#L338)
-8.  Makefile depends on a few environment. To make things easy and streamline add setenv.sh. [see here](https://github.com/rocrisp/kubetruth/blob/main/setenv.sh)
-9.  Execute setenv.sh with
-````
-source setenv.sh
-````
-10.  Build the operator, and the operator bundle
+   4. OLM understand files in bundle format. [Bundle Documentation](https://sdk.operatorframework.io/docs/olm-integration/generation/)
+   
+    ````
+    make bundle
+    ````
+    [See example](https://github.com/rocrisp/kubetruth/tree/main/bundle)
+
+
+7.   Build and push the Operator, and the Operator bundle
 ````
 make docker-build docker-push
 make bundle-build bundle-push
 ````
 
-11.  The extra serviceAccount is created in  limited kubetruth-operator-system namespace. [see here](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator-kubetruth-install-clusterrolebinding_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml#L13)
+8.   The extra serviceAccount is created in  kubetruth-operator-system namespace. [See example](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator-kubetruth-install-clusterrolebinding_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml#L13)
+
+NOTE: You can change the namespace that's hardwired in the manifest yaml file.
 
 Create the namespace
 
-    
     oc new-project kubetruth-operator-system
     
     
-12.   Deploy the operator using Operator SDK intergration with OLM
+9.   Deploy the operator using Operator SDK intergration with OLM
    
+    operator-sdk run bundle quay.io/rocrisp/kubetruth-operator-bundle:v3.0.0
     
-    operator-sdk run bundle quay.io/rocrisp/kubetruth-operator-bundle:v0.1.0
-    
-13.  Deploy the operand
+10.  Deploy the operand
 ````
 oc apply -f config/samples/apps_v1alpha1_kubetruth.yaml
 ````
 
-Some tools to have when you're trying to test your operator.
+This is a handy command for when you're installing and deleting operators .
 
-This command will remove resources created by OLM, but will not remove clusterrole, clusterrolebinding, and serviceAccount.
+It will remove resources created by OLM.
 ````
 operator-sdk cleanup kubetruth-operator
 ````
 
-There are times you need to modify CSV file. This command validas the syntax to make sure all the Ts and Ds are checked.
+Also, there are times you need to modify CSV file. This command validates the syntax to make sure dot the i's and cross the t's.
 ````
 operator-sdk bundle validate ./bundle
 ````
