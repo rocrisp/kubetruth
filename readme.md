@@ -177,7 +177,7 @@ Create the namespace
     
     operator-sdk run bundle quay.io/rocrisp/kubetruth-operator-bundle:v0.1.0
     
-1.  As the last step, we deploy the operand.
+13.  Deploy the operand
 ````
 oc apply -f config/samples/apps_v1alpha1_kubetruth.yaml
 ````

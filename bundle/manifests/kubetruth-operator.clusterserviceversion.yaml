@@ -72,7 +72,7 @@ metadata:
     capabilities: Basic Install
     operators.operatorframework.io/builder: operator-sdk-v1.25.2
     operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
-  name: kubetruth-operator.v0.0.1
+  name: kubetruth-operator.v1.0.0
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -84,7 +84,7 @@ spec:
     - kind: ProjectMapping
       name: projectmappings.kubetruth.cloudtruth.com
       version: v1
-  description: store secrets and configmaps
+  description: store secrets and configurations
   displayName: kubetruth
   icon:
   - base64data: ""
@@ -172,6 +172,14 @@ spec:
           - patch
           - delete
         - apiGroups:
+          - ""
+          resources:
+          - namespaces
+          verbs:
+          - get
+          - list
+          - create
+        - apiGroups:
           - authentication.k8s.io
           resources:
           - tokenreviews
@@ -252,7 +260,7 @@ spec:
                 - --metrics-bind-address=127.0.0.1:8080
                 - --leader-elect
                 - --leader-election-id=kubetruth-operator
-                image: controller:latest
+                image: quay.io/rocrisp/kubetruth-operator:v1.0.0
                 livenessProbe:
                   httpGet:
                     path: /healthz
@@ -327,15 +335,17 @@ spec:
   - supported: true
     type: AllNamespaces
   keywords:
-  - kubetruth
-  - helm operator
+  - secrets
+  - configmaps
+  - storage
+  - helm-based operator
   links:
   - name: Kubetruth Operator
     url: https://kubetruth-operator.domain
   maintainers:
-  - email: kubetruth@email.com
-    name: kubetruth
+  - email: email1
+    name: placeholder
   maturity: alpha
   provider:
-    name: kubetruth
-  version: 0.0.1
+    name: kubetruth for cloudtruth
+  version: 1.0.0

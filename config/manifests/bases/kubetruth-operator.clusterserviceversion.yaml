@@ -2,331 +2,22 @@ apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
   annotations:
-    alm-examples: |-
-      [
-        {
-          "apiVersion": "apps.cloudtruth.com/v1alpha1",
-          "kind": "KubeTruth",
-          "metadata": {
-            "name": "kubetruth-sample"
-          },
-          "spec": {
-            "affinity": {},
-            "appSettings": {
-              "apiKey": "832guQjd.nMpEZa2Xuvup2W2usCOtnGh83RUASFOZ",
-              "apiUrl": null,
-              "async": true,
-              "debug": false,
-              "pollingInterval": null
-            },
-            "autoscaling": {
-              "enabled": false,
-              "maxReplicas": 100,
-              "minReplicas": 1,
-              "targetCPUUtilizationPercentage": 80
-            },
-            "fullnameOverride": "",
-            "image": {
-              "pullPolicy": "Always",
-              "repository": "cloudtruth/kubetruth",
-              "tag": ""
-            },
-            "imagePullSecrets": [],
-            "nameOverride": "",
-            "nodeSelector": {},
-            "podAnnotations": {},
-            "podSecurityContext": {},
-            "projectMappings": {
-              "root": {
-                "context": {
-                  "resource_name": "{{ project | dns_safe }}",
-                  "resource_namespace": "{{ mapping_namespace }}",
-                  "skip_secrets": false
-                },
-                "environment": "default",
-                "project_selector": "^(?!kubetruth)",
-                "resource_templates": {
-                  "configmap": "{%- if parameters.size \u003e 0 %}\napiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: \"{{ context.resource_name }}\"\n  namespace: \"{{ context.resource_namespace }}\"\n  labels:\n    version: \"{{ parameters | sort | to_json | sha256 | slice: 0, 7 }}\"\n  annotations:\n    kubetruth/project_heirarchy: |\n      {{ project_heirarchy | to_yaml | indent: 6 | lstrip }}\n    kubetruth/parameter_origins: |\n      {{ parameter_origins | to_yaml | indent: 6 | lstrip }}\ndata:\n  {%- for parameter in parameters %}\n  {{ parameter[0] | key_safe | stringify }}: {{ parameter[1] | stringify }}\n  {%- endfor %}\n{%- endif %}\n",
-                  "secret": "{%- unless context.skip_secrets or secrets.size == 0 %}\napiVersion: v1\nkind: Secret\nmetadata:\n  name: \"{{ context.resource_name }}\"\n  namespace: \"{{ context.resource_namespace }}\"\n  labels:\n    version: \"{{ secrets | sort | to_json | sha256 | slice: 0, 7 }}\"\n  annotations:\n    kubetruth/project_heirarchy: |\n      {{ project_heirarchy | to_yaml | indent: 6 | lstrip }}\n    kubetruth/parameter_origins: |\n      {{ secret_origins | to_yaml | indent: 6 | lstrip }}\ndata:\n  {%- for secret in secrets %}\n  {{ secret[0] | key_safe | stringify }}: {{ secret[1] | encode64 | stringify }}\n  {%- endfor %}\n{%- endunless %}\n"
-                },
-                "scope": "root"
-              },
-              "webcontrol": {
-                "project_selector": "^kubetruth$",
-                "resource_templates": {
-                  "crds": "{%- for template in templates.names %}\n\n{%- assign is_raw_template = templates[template] | re_contains: \"^\\s*#\\~\\s*format:\\s*raw\" %}\n{%- if is_raw_template %}\n\n{{ templates[template] }}\n\n{%- else %}\n\n{%- assign name_parts = template | split: \"/\" %}\n{%- assign name = name_parts | last %}\n\napiVersion: kubetruth.cloudtruth.com/v1\nkind: ProjectMapping\nmetadata:\n  name: \"{{ name }}\"\n  {%- if name_parts.size \u003e 1 %}\n  namespace: \"{{ name_parts | first }}\"\n  {%- endif %}\n\nspec: {{ templates[template] | nindent: 2 }}\n\n{%- endif %}\n\n{% unless forloop.last %}---{% endunless %}\n{%- endfor %}\n"
-                },
-                "scope": "override",
-                "skip": true,
-                "suppress_namespace_inheritance": true
-              }
-            },
-            "replicaCount": 1,
-            "secret": {
-              "create": true,
-              "name": ""
-            }
-          }
-        }
-      ]
+    alm-examples: '[]'
     capabilities: Basic Install
-    operators.operatorframework.io/builder: operator-sdk-v1.25.2
-    operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
-  name: kubetruth-operator.v0.0.2
+  name: kubetruth-operator.v0.0.0
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
-  customresourcedefinitions:
-    owned:
-    - kind: KubeTruth
-      name: kubetruths.apps.cloudtruth.com
-      version: v1alpha1
-  description: store secrets and configmaps
+  customresourcedefinitions: {}
+  description: store secrets and configurations
   displayName: kubetruth
   icon:
   - base64data: ""
     mediatype: ""
   install:
     spec:
-      clusterPermissions:
-      - rules:
-        - apiGroups:
-          - kubetruth.cloudtruth.com
-          resources:
-          - projectmappings
-          verbs:
-          - get
-          - list
-          - watch
-          - create
-          - update
-          - patch
-          - delete
-        - apiGroups:
-          - ""
-          resources:
-          - namespaces
-          verbs:
-          - get
-        - apiGroups:
-          - ""
-          resources:
-          - secrets
-          verbs:
-          - '*'
-        - apiGroups:
-          - ""
-          resources:
-          - events
-          verbs:
-          - create
-        - apiGroups:
-          - apps.cloudtruth.com
-          resources:
-          - kubetruths
-          - kubetruths/status
-          - kubetruths/finalizers
-          verbs:
-          - create
-          - delete
-          - get
-          - list
-          - patch
-          - update
-          - watch
-        - apiGroups:
-          - ""
-          resources:
-          - pods
-          - services
-          - services/finalizers
-          - endpoints
-          - persistentvolumeclaims
-          - events
-          - configmaps
-          - secrets
-          verbs:
-          - create
-          - delete
-          - get
-          - list
-          - patch
-          - update
-          - watch
-        - apiGroups:
-          - apps
-          resources:
-          - deployments
-          - daemonsets
-          - replicasets
-          - statefulsets
-          verbs:
-          - create
-          - delete
-          - get
-          - list
-          - patch
-          - update
-          - watch
-        - apiGroups:
-          - authentication.k8s.io
-          resources:
-          - tokenreviews
-          verbs:
-          - create
-        - apiGroups:
-          - authorization.k8s.io
-          resources:
-          - subjectaccessreviews
-          verbs:
-          - create
-        serviceAccountName: kubetruth-operator-controller-manager
-      deployments:
-      - label:
-          app.kubernetes.io/component: manager
-          app.kubernetes.io/created-by: kubetruth-operator
-          app.kubernetes.io/instance: controller-manager
-          app.kubernetes.io/managed-by: kustomize
-          app.kubernetes.io/name: deployment
-          app.kubernetes.io/part-of: kubetruth-operator
-          control-plane: controller-manager
-        name: kubetruth-operator-controller-manager
-        spec:
-          replicas: 1
-          selector:
-            matchLabels:
-              control-plane: controller-manager
-          strategy: {}
-          template:
-            metadata:
-              annotations:
-                kubectl.kubernetes.io/default-container: manager
-              labels:
-                control-plane: controller-manager
-            spec:
-              affinity:
-                nodeAffinity:
-                  requiredDuringSchedulingIgnoredDuringExecution:
-                    nodeSelectorTerms:
-                    - matchExpressions:
-                      - key: kubernetes.io/arch
-                        operator: In
-                        values:
-                        - amd64
-                        - arm64
-                        - ppc64le
-                        - s390x
-                      - key: kubernetes.io/os
-                        operator: In
-                        values:
-                        - linux
-              containers:
-              - args:
-                - --secure-listen-address=0.0.0.0:8443
-                - --upstream=http://127.0.0.1:8080/
-                - --logtostderr=true
-                - --v=0
-                image: gcr.io/kubebuilder/kube-rbac-proxy:v0.13.0
-                name: kube-rbac-proxy
-                ports:
-                - containerPort: 8443
-                  name: https
-                  protocol: TCP
-                resources:
-                  limits:
-                    cpu: 500m
-                    memory: 128Mi
-                  requests:
-                    cpu: 5m
-                    memory: 64Mi
-                securityContext:
-                  allowPrivilegeEscalation: false
-                  capabilities:
-                    drop:
-                    - ALL
-              - args:
-                - --health-probe-bind-address=:8081
-                - --metrics-bind-address=127.0.0.1:8080
-                - --leader-elect
-                - --leader-election-id=kubetruth-operator
-                image: quay.io/rocrisp/kubetruth-operator:v0.0.2
-                livenessProbe:
-                  httpGet:
-                    path: /healthz
-                    port: 8081
-                  initialDelaySeconds: 15
-                  periodSeconds: 20
-                name: manager
-                readinessProbe:
-                  httpGet:
-                    path: /readyz
-                    port: 8081
-                  initialDelaySeconds: 5
-                  periodSeconds: 10
-                resources:
-                  limits:
-                    cpu: 500m
-                    memory: 128Mi
-                  requests:
-                    cpu: 10m
-                    memory: 64Mi
-                securityContext:
-                  allowPrivilegeEscalation: false
-                  capabilities:
-                    drop:
-                    - ALL
-              securityContext:
-                runAsNonRoot: true
-              serviceAccountName: kubetruth-operator-controller-manager
-              terminationGracePeriodSeconds: 10
-      permissions:
-      - rules:
-        - apiGroups:
-          - ""
-          resources:
-          - configmaps
-          - serviceaccounts
-          verbs:
-          - get
-          - list
-          - watch
-          - create
-          - update
-          - patch
-          - delete
-        - apiGroups:
-          - coordination.k8s.io
-          resources:
-          - leases
-          verbs:
-          - get
-          - list
-          - watch
-          - create
-          - update
-          - patch
-          - delete
-        - apiGroups:
-          - ""
-          resources:
-          - events
-          verbs:
-          - create
-          - patch
-        - apiGroups:
-          - kubetruth.cloudtruth.com
-          resources:
-          - projectmappings
-          verbs:
-          - get
-          - list
-          - watch
-          - create
-          - update
-          - patch
-          - delete
-        serviceAccountName: kubetruth-operator-controller-manager
-    strategy: deployment
+      deployments: null
+    strategy: ""
   installModes:
   - supported: false
     type: OwnNamespace
@@ -337,15 +28,17 @@ spec:
   - supported: true
     type: AllNamespaces
   keywords:
-  - kubetruth
-  - helm operator
+  - secrets
+  - configmaps
+  - storage
+  - helm-based operator
   links:
   - name: Kubetruth Operator
     url: https://kubetruth-operator.domain
   maintainers:
-  - email: kubetruth@email.com
-    name: kubetruth
+  - email: email1
+    name: placeholder
   maturity: alpha
   provider:
-    name: kubetruth
-  version: 0.0.2
+    name: kubetruth for cloudtruth
+  version: 0.0.0
