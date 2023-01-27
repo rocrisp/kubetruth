@@ -88,12 +88,12 @@ oc get pod kubetruth-install-777d7d8745-l4d7q -oyaml | grep scc
    * templates/rolebinding.yaml
    * templates/serviceaccount.yaml
 
-3. Extract the following from the helm charts and move it into the config/manifests/base directory
+3. Extract the following from the helm charts and move it into the bundle/manifests directory
    * crds/projectmapping.yaml
    
-4. We need to add SCC anyuid to the serviceaccount.
+4. We need to add SCC anyuid to the clusterrole which is bind to the serviceaccount.
 
-5. We want to remove [this section](https://github.com/cloudtruth/kubetruth/blob/main/helm/kubetruth/templates/_helpers.tpl#L53-L62) of the helpers. 
+5. The OLM is creating the serviceAccount so remove [this section](https://github.com/cloudtruth/kubetruth/blob/main/helm/kubetruth/templates/_helpers.tpl#L53-L62) of the helpers. 
 
 ### Let's begin by creatinig a Helm-based operator.
 
