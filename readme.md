@@ -4,7 +4,7 @@
 
 ### First, we want make sure KubeTruth works on Openshift 4.12.
 
-Follow these [directions](https://docs.cloudtruth.com/integrations/kubernetes) to install KubeTruth on Openshift 4.12.
+Follow directions [in here](https://docs.cloudtruth.com/integrations/kubernetes) to install KubeTruth on Openshift 4.12.
 
 After KubeTruth installed on Openshift 4.12, we see the pod is not running, and it has a Error status. 
 
