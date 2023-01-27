@@ -80,13 +80,15 @@ oc get pod kubetruth-install-777d7d8745-l4d7q -oyaml | grep scc
 
 1. The Operator already have a custom Kind associated with the Ruby Operator, so we will create a new Kind with a different name.
    
-2. We need to extract the following from the helm charts and move them into the config/rback directory
+#### We want to extract any rbac from the helm charts because OLM handles all rbac.
+
+2. Extract the following from the helm charts and move them into the config/rback directory
    * templates/clusterrole.yaml
    * templates/clusterrolebinding.yaml
    * templates/rolebinding.yaml
    * templates/serviceaccount.yaml
 
-3. We need to extract the following from the helm charts and move it into the config/manifests/base directory
+3. Extract the following from the helm charts and move it into the config/manifests/base directory
    * crds/projectmapping.yaml
    
 4. We need to add SCC anyuid to the serviceaccount.
