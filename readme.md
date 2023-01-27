@@ -35,7 +35,7 @@ So now let's examine restricted-v2 :
 ````
 oc describe scc restricted-v2
 ````
-The reason why we can't write to /srv/app/Gemfile.lock is because the pod needs to run with userid => 1000740000
+The reason why we can't write to /srv/app/Gemfile.lock is because the pod runs with userid => 1000740000
 
 ````
 $ oc get pod kubetruth-install-777d7d8745-xnxhd -oyaml | grep runAsUser
