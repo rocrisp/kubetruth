@@ -149,11 +149,12 @@ operator-sdk create api \
    See the directory created by the command [here](https://github.com/rocrisp/kubetruth/tree/main/bundle)
 
    The manifests directory holds all the generated files from [config/](https://github.com/rocrisp/kubetruth/tree/main/config)
-4.  Move projectmapping.yaml from helm-chart/kubetruth/crd/ directory to config/crd/bases/projectmapping.yaml.
-5.  Modify config/crd/kustomization.yaml to include projectmapping.yaml.
-6.  The rbac permission from [here](https://github.com/cloudtruth/kubetruth/blob/981d3719a4e1ab6c70e9f8e6c41ed21da06d3acb/helm/kubetruth/values.yaml#L26) is added to csv [here](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator.clusterserviceversion.yaml#L95) and [here](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator.clusterserviceversion.yaml#L338)
-7.  There are a few environment variables the Makefile depends. I added a setenv.sh file to make it easy for when you need to build, push containers. [see here](https://github.com/rocrisp/kubetruth/blob/main/setenv.sh)
-8.  You can execute the setenv.sh with this command,
+4.  Move projectmapping.yaml from helm-chart/kubetruth/crd/ directory to config/crd/bases/projectmapping.yaml.[See here](https://github.com/rocrisp/kubetruth/tree/main/config/crd/bases)
+5.  Modify config/crd/kustomization.yaml to include projectmapping.yaml. [See here](https://github.com/rocrisp/kubetruth/blob/main/config/crd/kustomization.yaml#L6)
+6.  Add a sample cr for kind: ProjectMapping. [See here](https://github.com/rocrisp/kubetruth/blob/main/config/samples/apps_v1alpha1_projectmapping.yaml)
+7.  The rbac permission from [here](https://github.com/cloudtruth/kubetruth/blob/981d3719a4e1ab6c70e9f8e6c41ed21da06d3acb/helm/kubetruth/values.yaml#L26) is added to csv [here](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator.clusterserviceversion.yaml#L95) and [here](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator.clusterserviceversion.yaml#L338)
+8.  There are a few environment variables the Makefile depends. I added a setenv.sh file to make it easy for when you need to build, push containers. [see here](https://github.com/rocrisp/kubetruth/blob/main/setenv.sh)
+9.  You can execute the setenv.sh with this command,
 ````
 source setenv.sh
 ````
