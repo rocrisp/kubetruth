@@ -90,21 +90,29 @@ oc get pod kubetruth-install-777d7d8745-l4d7q -oyaml | grep scc
 ````
 operator-sdk init --domain cloudtruth.com --plugins helm
 ````
-2. Create the API and fetch the Helm chart from my local disk
+2. Create the API.
+
+   Group : apps
+
+   Version : v1alpha1
+
+   Kind : KubeTruth
+
+   Fetch the Helm chart from my local disk
 ````
 operator-sdk create api \
  --group=apps --version=v1alpha1 \
  --kind=KubeTruth \
  --helm-chart=/Users/rosecrisp/codebase/kubetruth/helm/kubetruth
 ````
-3. Remove rbac contents from helm-charts/kubetruth/values.yaml [see result](https://github.com/rocrisp/kubetruth/blob/main/helm-charts/kubetruth/values.yaml)
-4. Remove clusterrole.yaml, clusterrolebinding.yaml, role.yaml, rolebinding.yaml, and serviceaccount.yaml [see result](https://github.com/rocrisp/kubetruth/tree/main/helm-charts/kubetruth/templates)
-5. To get around SCC, we create a serviceaccount, clusterrole, and clusterrolebinding. With this, the pod will be created with anyuid which allows any id to access the container in the Pod. [see here](https://github.com/rocrisp/kubetruth/tree/main/config/rbac)
+1. Remove rbac contents from helm-charts/kubetruth/values.yaml [see result](https://github.com/rocrisp/kubetruth/blob/main/helm-charts/kubetruth/values.yaml)
+2. Remove clusterrole.yaml, clusterrolebinding.yaml, role.yaml, rolebinding.yaml, and serviceaccount.yaml [see result](https://github.com/rocrisp/kubetruth/tree/main/helm-charts/kubetruth/templates)
+3. To get around SCC, we create a serviceaccount, clusterrole, and clusterrolebinding. With this, the pod will be created with anyuid which allows any id to access the container in the Pod. [see here](https://github.com/rocrisp/kubetruth/tree/main/config/rbac)
 
    The clusterrole has the scc changes needed for the pod to be able to create a container with anyuid allows any id to access the container in the pod [see here](https://github.com/rocrisp/kubetruth/blob/main/config/rbac/kubetruth_install_clusterrole.yaml#L41)
 
-6. The deployment will use the newly created serviceAccount so the container in the pod has the changes for the scc. To make this happen, in the templates/deployment.yaml file modify the serviceAccountName to "kubetruth-operator-kubetruth-install [see here](https://github.com/rocrisp/kubetruth/blob/main/helm-charts/kubetruth/templates/deployment.yaml#L27)
-7. Now we want to integrate with OLM to make delivering software very easy. In our case, we have an extra serviceaccount so we have to let OLM know about this service account so the yaml will be generated properly.
+4. The deployment will use the newly created serviceAccount so the container in the pod has the changes for the scc. To make this happen, in the templates/deployment.yaml file modify the serviceAccountName to "kubetruth-operator-kubetruth-install [see here](https://github.com/rocrisp/kubetruth/blob/main/helm-charts/kubetruth/templates/deployment.yaml#L27)
+5. Now we want to integrate with OLM to make delivering software very easy. In our case, we have an extra serviceaccount so we have to let OLM know about this service account so the yaml will be generated properly.
    1. The first thing to do is the modify the Makefile. We need to add extra flags --extra-servive-accounts [see doc](https://sdk.operatorframework.io/docs/advanced-topics/multi-sa/).
    The result look like [this](https://github.com/rocrisp/kubetruth/blob/main/Makefile#L157)
    2. Now we can make the bundle by,
@@ -115,28 +123,28 @@ operator-sdk create api \
 
    The manifests directory holds all the generated files from [config/](https://github.com/rocrisp/kubetruth/tree/main/config)
 
-8. The crd, projectmapping.yaml, in helm-chart/kubetruth/crd/ directory will be automatically deployed if you put it [here](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/projectmapping.yaml)
-9.  The rbac permission from [here](https://github.com/cloudtruth/kubetruth/blob/981d3719a4e1ab6c70e9f8e6c41ed21da06d3acb/helm/kubetruth/values.yaml#L26) is added to csv [here](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator.clusterserviceversion.yaml#L95) and [here](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator.clusterserviceversion.yaml#L338)
-10. There are a few environment variables the Makefile depends. I added a setenv.sh file to make it easy for when you need to build, push containers. [see here](https://github.com/rocrisp/kubetruth/blob/main/setenv.sh)
-11. You can execute the setenv.sh with this command,
+6. The crd, projectmapping.yaml, in helm-chart/kubetruth/crd/ directory will be automatically deployed if you put it [here](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/projectmapping.yaml)
+7.  The rbac permission from [here](https://github.com/cloudtruth/kubetruth/blob/981d3719a4e1ab6c70e9f8e6c41ed21da06d3acb/helm/kubetruth/values.yaml#L26) is added to csv [here](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator.clusterserviceversion.yaml#L95) and [here](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator.clusterserviceversion.yaml#L338)
+8.  There are a few environment variables the Makefile depends. I added a setenv.sh file to make it easy for when you need to build, push containers. [see here](https://github.com/rocrisp/kubetruth/blob/main/setenv.sh)
+9.  You can execute the setenv.sh with this command,
 ````
 source setenv.sh
 ````
-12. And now we can build the operator, operator bundle, and deploy it using olm integration with operator-sdk
+1.  And now we can build the operator, operator bundle, and deploy it using olm integration with operator-sdk
 ````
 make docker-build docker-push
 make bundle-build bundle-push
 ````
-13. Having the extra serviceAccount means that you're limited to a namespace. [see here](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator-kubetruth-install-clusterrolebinding_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml#L13)
+1.  Having the extra serviceAccount means that you're limited to a namespace. [see here](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator-kubetruth-install-clusterrolebinding_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml#L13)
     so we create the namespace first,
     ````
     oc new-project kubetruth-operator-system
     ```
-14. Now we can use OLM to deploy our operator.
+2.  Now we can use OLM to deploy our operator.
 ```
 operator-sdk run bundle quay.io/rocrisp/kubetruth-operator-bundle:v0.1.0
 ```
-15. As the last step, we deploy the operand.
+1.  As the last step, we deploy the operand.
 ````
 oc apply -f config/samples/apps_v1alpha1_kubetruth.yaml
 ````
