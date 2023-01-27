@@ -65,7 +65,7 @@ oc adm policy add-scc-to-user anyuid -z kubetruth-install
 oc get pod kubetruth-install-777d7d8745-l4d7q -oyaml | grep scc
     openshift.io/scc: anyuid
 ````
-1. Examine runAsUser.
+6. Examine runAsUser.
    
    Should return nothing.
    
