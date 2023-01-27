@@ -140,9 +140,7 @@ operator-sdk create api \
     source setenv.sh
     ````
 
-   4. OLM understand files in bundle format. [Bundle Documentation](https://sdk.operatorframework.io/docs/olm-integration/generation/)
-   
-   Create bundle format
+   4. OLM understand files in bundle format. [Bundle Documentation](https://sdk.operatorframework.io/docs/olm-integration/generation/) so we create bundle format
 
         make bundle
     
