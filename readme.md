@@ -116,33 +116,41 @@ operator-sdk create api \
  --kind=KubeTruth \
  --helm-chart=/Users/rosecrisp/codebase/kubetruth/helm/kubetruth
 ````
-1. Remove rbac contents from helm-charts/kubetruth/values.yaml [see result](https://github.com/rocrisp/kubetruth/blob/main/helm-charts/kubetruth/values.yaml). This will be handled by OLM.
-2. Remove serviceAccount contents from helm-charts/kubetruth/values.yaml. This will be handled by OLM.
-3. Extract clusterrole.yaml, clusterrolebinding.yaml, role.yaml, rolebinding.yaml, and serviceaccount.yaml from helm-charts/kubetruth/templates dir [see result](https://github.com/rocrisp/kubetruth/tree/main/helm-charts/kubetruth/templates)
-4. OLM handles the rbac, so create serviceaccount.yaml, clusterrole.yaml, and clusterrolebinding.yaml in the config/rbac/ subdir [see here](https://github.com/rocrisp/kubetruth/tree/main/config/rbac)
+1. Rbac and serviceAccount will be handled by OLM so we need to remove the following :
+    
+    Remove rbac contents from helm-charts/kubetruth/values.yaml 
+   
+    Remove serviceAccount contents from helm-charts/kubetruth/values.yaml.
+   
+   [See here](https://github.com/rocrisp/kubetruth/blob/main/helm-charts/kubetruth/values.yaml) 
+   
+   Extract clusterrole.yaml, clusterrolebinding.yaml, role.yaml, rolebinding.yaml, and serviceaccount.yaml from helm-charts/kubetruth/templates dir [see result](https://github.com/rocrisp/kubetruth/tree/main/helm-charts/kubetruth/templates)
+   
+   Create serviceaccount.yaml, clusterrole.yaml, and clusterrolebinding.yaml in the config/rbac/ subdir [see here](https://github.com/rocrisp/kubetruth/tree/main/config/rbac)
 
    Notice the clusterrole with the SCC with anyuid allows anyuid to access the container in the pod [see here](https://github.com/rocrisp/kubetruth/blob/main/config/rbac/kubetruth_install_clusterrole.yaml#L41)
-5. Move projectmappings.yaml from helm-charts/kubetruth/crds subdir to config/manifests subdir
-6. OLM automatically generate the serviceAccount so the deployment.yaml need to reference the new serviceAccountName by replacing the serviceAccountName in the helm-charts/kubetruth/templates/deployment.yaml to "kubetruth-operator-kubetruth-install" [see here](https://github.com/rocrisp/kubetruth/blob/main/helm-charts/kubetruth/templates/deployment.yaml#L27)
-7. Now we want to integrate with OLM to make delivering software very easy. 
+
+2. Update serviceAccountName in helm-charts/kubetruth/templates/deployment.yaml to "kubetruth-operator-kubetruth-install" [see here](https://github.com/rocrisp/kubetruth/blob/main/helm-charts/kubetruth/templates/deployment.yaml#L27)
+3. Integrate with OLM to make delivering software very easy. 
 
    1. We have an extra serviceaccount.
    
-   Add the extra serviceaccount to OLM by adding an extra flag --extra-servive-accounts to the Makefile [see doc](https://sdk.operatorframework.io/docs/advanced-topics/multi-sa/).
-   The result look like [this](https://github.com/rocrisp/kubetruth/blob/main/Makefile#L157)
+        Add the extra serviceaccount to OLM by adding an extra flag --extra-servive-accounts to the Makefile [see doc](https://sdk.operatorframework.io/docs/advanced-topics/multi-sa/).
+        
+        Should look like [this](https://github.com/rocrisp/kubetruth/blob/main/Makefile#L157)
 
    2. Generate files in bundle format Example, search for ["make bundle"](https://sdk.operatorframework.io/docs/olm-integration/generation/)
    
-   ````
-   make bundle
-   ````
+        ````
+        make bundle
+        ````
    See the directory created by the command [here](https://github.com/rocrisp/kubetruth/tree/main/bundle)
 
    The manifests directory holds all the generated files from [config/](https://github.com/rocrisp/kubetruth/tree/main/config)
-8. Move projectmapping.yaml from helm-chart/kubetruth/crd/ directory to bundle/manifests subdir so OLM can install it automatically. [See here](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/projectmapping.yaml)
-9.  The rbac permission from [here](https://github.com/cloudtruth/kubetruth/blob/981d3719a4e1ab6c70e9f8e6c41ed21da06d3acb/helm/kubetruth/values.yaml#L26) is added to csv [here](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator.clusterserviceversion.yaml#L95) and [here](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator.clusterserviceversion.yaml#L338)
-10. There are a few environment variables the Makefile depends. I added a setenv.sh file to make it easy for when you need to build, push containers. [see here](https://github.com/rocrisp/kubetruth/blob/main/setenv.sh)
-11. You can execute the setenv.sh with this command,
+4.  Move projectmapping.yaml from helm-chart/kubetruth/crd/ directory to bundle/manifests subdir so OLM can install it during operator installation. [See here](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/projectmapping.yaml)
+5.  The rbac permission from [here](https://github.com/cloudtruth/kubetruth/blob/981d3719a4e1ab6c70e9f8e6c41ed21da06d3acb/helm/kubetruth/values.yaml#L26) is added to csv [here](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator.clusterserviceversion.yaml#L95) and [here](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator.clusterserviceversion.yaml#L338)
+6.  There are a few environment variables the Makefile depends. I added a setenv.sh file to make it easy for when you need to build, push containers. [see here](https://github.com/rocrisp/kubetruth/blob/main/setenv.sh)
+7.  You can execute the setenv.sh with this command,
 ````
 source setenv.sh
 ````
