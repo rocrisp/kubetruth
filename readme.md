@@ -128,6 +128,8 @@ operator-sdk create api \
    
    Create serviceaccount.yaml, clusterrole.yaml, and clusterrolebinding.yaml in the config/rbac/ subdir [see here](https://github.com/rocrisp/kubetruth/tree/main/config/rbac)
 
+   Modify config/rbac/kustomization.yaml to include the files just created. [see here](https://github.com/rocrisp/kubetruth/blob/main/config/rbac/kustomization.yaml#L20)
+
    Notice the clusterrole with the SCC with anyuid allows anyuid to access the container in the pod [see here](https://github.com/rocrisp/kubetruth/blob/main/config/rbac/kubetruth_install_clusterrole.yaml#L41)
 
 2. Update serviceAccountName in helm-charts/kubetruth/templates/deployment.yaml to "kubetruth-operator-kubetruth-install" [see here](https://github.com/rocrisp/kubetruth/blob/main/helm-charts/kubetruth/templates/deployment.yaml#L27)
@@ -147,10 +149,11 @@ operator-sdk create api \
    See the directory created by the command [here](https://github.com/rocrisp/kubetruth/tree/main/bundle)
 
    The manifests directory holds all the generated files from [config/](https://github.com/rocrisp/kubetruth/tree/main/config)
-4.  Move projectmapping.yaml from helm-chart/kubetruth/crd/ directory to bundle/manifests subdir so OLM can install it during operator installation. [See here](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/projectmapping.yaml)
-5.  The rbac permission from [here](https://github.com/cloudtruth/kubetruth/blob/981d3719a4e1ab6c70e9f8e6c41ed21da06d3acb/helm/kubetruth/values.yaml#L26) is added to csv [here](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator.clusterserviceversion.yaml#L95) and [here](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator.clusterserviceversion.yaml#L338)
-6.  There are a few environment variables the Makefile depends. I added a setenv.sh file to make it easy for when you need to build, push containers. [see here](https://github.com/rocrisp/kubetruth/blob/main/setenv.sh)
-7.  You can execute the setenv.sh with this command,
+4.  Move projectmapping.yaml from helm-chart/kubetruth/crd/ directory to config/crd/bases/projectmapping.yaml.
+5.  Modify config/crd/kustomization.yaml to include projectmapping.yaml.
+6.  The rbac permission from [here](https://github.com/cloudtruth/kubetruth/blob/981d3719a4e1ab6c70e9f8e6c41ed21da06d3acb/helm/kubetruth/values.yaml#L26) is added to csv [here](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator.clusterserviceversion.yaml#L95) and [here](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator.clusterserviceversion.yaml#L338)
+7.  There are a few environment variables the Makefile depends. I added a setenv.sh file to make it easy for when you need to build, push containers. [see here](https://github.com/rocrisp/kubetruth/blob/main/setenv.sh)
+8.  You can execute the setenv.sh with this command,
 ````
 source setenv.sh
 ````

@@ -91,50 +91,6 @@ spec:
       clusterPermissions:
       - rules:
         - apiGroups:
-          - ""
-          resources:
-          - namespaces
-          verbs:
-          - get
-          - list
-          - create
-        - apiGroups:
-          - kubetruth.cloudtruth.com
-          resources:
-          - projectmappings
-          verbs:
-          - get
-          - list
-          - watch
-          - create
-          - update
-          - patch
-          - delete
-        - apiGroups:
-          - ""
-          resources:
-          - configmaps
-          - secrets
-          verbs:
-          - get
-          - list
-          - watch
-          - create
-          - update
-          - patch
-          - delete
-        - apiGroups:
-          - security.openshift.io
-          resourceNames:
-          - anyuid
-          resources:
-          - securitycontextconstraints
-          verbs:
-          - use
-        serviceAccountName: kubetruth-install
-      clusterPermissions:
-      - rules:
-        - apiGroups:
           - kubetruth.cloudtruth.com
           resources:
           - projectmappings
@@ -323,18 +279,6 @@ spec:
                 runAsNonRoot: true
               serviceAccountName: kubetruth-operator-controller-manager
               terminationGracePeriodSeconds: 10
-      permissions:
-      - rules:
-        - apiGroups:
-          - security.openshift.io
-          resourceNames:
-          - anyuid
-          resources:
-          - securitycontextconstraints
-          verbs:
-          - use
-        serviceAccountName: kubetruth-install
-      
       permissions:
       - rules:
         - apiGroups:

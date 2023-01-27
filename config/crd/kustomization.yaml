@@ -3,4 +3,5 @@
 # It should be run by config/default
 resources:
 - bases/apps.cloudtruth.com_kubetruths.yaml
+- bases/projectmapping.yaml
 #+kubebuilder:scaffold:crdkustomizeresource

@@ -72,7 +72,7 @@ metadata:
     capabilities: Basic Install
     operators.operatorframework.io/builder: operator-sdk-v1.25.2
     operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
-  name: kubetruth-operator.v0.0.2
+  name: kubetruth-operator.v0.0.1
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -81,6 +81,9 @@ spec:
     - kind: KubeTruth
       name: kubetruths.apps.cloudtruth.com
       version: v1alpha1
+    - kind: ProjectMapping
+      name: projectmappings.kubetruth.cloudtruth.com
+      version: v1
   description: store secrets and configmaps
   displayName: kubetruth
   icon:
@@ -90,62 +93,6 @@ spec:
     spec:
       clusterPermissions:
       - rules:
-        - apiGroups:
-          - ""
-          resources:
-          - namespaces
-          verbs:
-          - get
-          - list
-          - create
-        - apiGroups:
-          - kubetruth.cloudtruth.com
-          resources:
-          - projectmappings
-          verbs:
-          - get
-          - list
-          - watch
-          - create
-          - update
-          - patch
-          - delete
-        - apiGroups:
-          - ""
-          resources:
-          - configmaps
-          - secrets
-          verbs:
-          - get
-          - list
-          - watch
-          - create
-          - update
-          - patch
-          - delete
-        - apiGroups:
-          - security.openshift.io
-          resourceNames:
-          - anyuid
-          resources:
-          - securitycontextconstraints
-          verbs:
-          - use
-        serviceAccountName: kubetruth-install
-      clusterPermissions:
-      - rules:
-        - apiGroups:
-          - kubetruth.cloudtruth.com
-          resources:
-          - projectmappings
-          verbs:
-          - get
-          - list
-          - watch
-          - create
-          - update
-          - patch
-          - delete
         - apiGroups:
           - ""
           resources:
@@ -212,6 +159,18 @@ spec:
           - patch
           - update
           - watch
+        - apiGroups:
+          - kubetruth.cloudtruth.com
+          resources:
+          - projectmappings
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
         - apiGroups:
           - authentication.k8s.io
           resources:
@@ -293,7 +252,7 @@ spec:
                 - --metrics-bind-address=127.0.0.1:8080
                 - --leader-elect
                 - --leader-election-id=kubetruth-operator
-                image: quay.io/rocrisp/kubetruth-operator:v0.0.2
+                image: controller:latest
                 livenessProbe:
                   httpGet:
                     path: /healthz
@@ -326,22 +285,9 @@ spec:
       permissions:
       - rules:
         - apiGroups:
-          - security.openshift.io
-          resourceNames:
-          - anyuid
-          resources:
-          - securitycontextconstraints
-          verbs:
-          - use
-        serviceAccountName: kubetruth-install
-      
-      permissions:
-      - rules:
-        - apiGroups:
           - ""
           resources:
           - configmaps
-          - serviceaccounts
           verbs:
           - get
           - list
@@ -369,18 +315,6 @@ spec:
           verbs:
           - create
           - patch
-        - apiGroups:
-          - kubetruth.cloudtruth.com
-          resources:
-          - projectmappings
-          verbs:
-          - get
-          - list
-          - watch
-          - create
-          - update
-          - patch
-          - delete
         serviceAccountName: kubetruth-operator-controller-manager
     strategy: deployment
   installModes:
@@ -404,4 +338,4 @@ spec:
   maturity: alpha
   provider:
     name: kubetruth
-  version: 0.0.2
+  version: 0.0.1
