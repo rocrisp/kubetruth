@@ -2,11 +2,15 @@
 
 [KubeTruth source code](https://github.com/cloudtruth/kubetruth)
 
-Background : We want to convert the already functioning KubeTruth Operator written in Ruby and Helm Chart to Kubernetes Operator that works on Openshift with as little changes to the source code as possible.
+### We want to convert the KubeTruth Operator written in Ruby and Helm Chart to Kubernetes Operator that works on Openshift 4.12 with as little changes to the source code as possible.
 
-[Click here to see how to deploy KubeTruth on Kubernetes](https://docs.cloudtruth.com/integrations/kubernetes)
+### The first thing we want to do is to make sure KubeTruth works on Openshift.
 
-1. The first thing we want to do is to make sure KubeTruth works on Openshift, so we installed it on Openshift 4.12. After installing KubeTruth we want to make sure the pod is running. However, it is not. The pod's status is Error. We can look at the Pod's log to findout why the pod is not running. 
+Follow the direction from [here](https://docs.cloudtruth.com/integrations/kubernetes) to install KubeTruth on Openshift 4.12.
+
+After installing KubeTruth we see the pod is not running with Error status. 
+
+So we look at the Pod's log for more info. 
    
 ````
 $ oc logs kubetruth-install-b8867597b-6cdqq
@@ -14,32 +18,31 @@ Starting app
 /usr/local/lib/ruby/3.0.0/bundler/shared_helpers.rb:105:in `rescue in filesystem_access': There was an error while trying to write to `/srv/app/Gemfile.lock`. It is likely that you need to grant write permissions for that path.
 ```` 
 We see that there's a problem writing to /srv/app/Gemfile.lock
-This is a correct behavior. Openshift uses security context constraints [(SCCs)](https://docs.openshift.com/container-platform/4.12/authentication/managing-security-context-constraints.html#security-context-constraints-about_configuring-internal-oauth) to control permissions for the pods in your cluster.
-With the exception of default, kube-system, and openshift-operators, the
- due to the SCC Openshift put on the pods.
 
- Openshift put strict SCC on pods, which means the container is run with a restricted scc
+This is a correct behavior in Openshift.
+
+Openshift uses security context constraints [(SCCs)](https://docs.openshift.com/container-platform/4.12/authentication/managing-security-context-constraints.html#security-context-constraints-about_configuring-internal-oauth) to control permissions for the pods in your cluster.
+
+With the exception of default, kube-system, and openshift-operators, namespaces, Openshift put restricted-v2 SCC on pods.
 
 ````
 $ oc get pod kubetruth-install-777d7d8745-xnxhd -oyaml | grep scc
     openshift.io/scc: restricted-v2
 ````
-The pod is run with userid => 1000740000
+
+So now let's examine restricted-v2 :
+
+````
+oc describe scc restricted-v2
+````
+The reason why we can't write to /srv/app/Gemfile.lock is because the pod needs to run with userid => 1000740000
 
 ````
 $ oc get pod kubetruth-install-777d7d8745-xnxhd -oyaml | grep runAsUser
       runAsUser: 1000740000
 ````
-For a normal pod, the default SCC is set as 'restricted-v2'. 
 
-Examine the restricted-v2 :
-
-````
-oc describe scc restricted-v2
-````
-
-
-Without having to change the container, we can get round this by adding scc policy for the serviceaccount.
+To fix this, without having to change the container's permission, we can add scc policy for the serviceaccount.
 
 1. Find out pod's ServiceAccountName
 
@@ -48,21 +51,25 @@ $ oc get pod kubetruth-install-b8867597b-6cdqq -oyaml | grep serviceAccountName
   serviceAccountName: kubetruth-install
 ````
 
-2. Then use this command so the pod can run with any id 
+1. Use this command to change scc from restricted-v2 to anyuid 
 
 ````
 oc adm policy add-scc-to-user anyuid -z kubetruth-install
 ````
 
-After the changes are made and also deleting the offending pod, a new pod spun up automatically and now has a status of Running.
+Deleting the offending pod and see a new pod  spins up automatically.
 
-### When we build the operator we have have a few things to consider.
+Examine the pod and it should be running.
 
-1. The Operator already has a CRD so we have to create a new Kind that's not in conflict.
+### So now that we have the Operator running, we can use what we already have and build onto it.
+
+A few things to consider when we build this Operator.
+
+1. The Operator has a CRD so we can create a new Kind not in conflict with the current CRD.
    
 2. We need to move the rbac from template/ to the config/rback directory
    
-3. Solve the problem with Openshift pod restrictive access.
+3. Solve the problem with SCC. Pod permission defaulting restricted-2.
 
 ### Let's begin by creatinig a Helm-based operator.
 
