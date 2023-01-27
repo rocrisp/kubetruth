@@ -2,7 +2,7 @@
 
 [KubeTruth source code](https://github.com/cloudtruth/kubetruth)
 
-### We want to convert the KubeTruth Operator written in Ruby and Helm Chart to Kubernetes Operator that works on Openshift 4.12 with as little changes to the source code as possible.
+### We want to convert the KubeTruth Operator written in Ruby and Helm Chart to Kubernetes Operator that will work on Openshift 4.12 and with as little changes to the source code as possible.
 
 ### The first thing we want to do is to make sure KubeTruth works on Openshift.
 
