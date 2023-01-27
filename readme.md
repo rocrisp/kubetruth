@@ -61,7 +61,7 @@ Delete the offending pod and you should see a new pod spins up automatically.
 
 Examine the pod and it should be running now.
 
-### Now that we have the Operator running, we can use it to build a Helm-based Operator using Operator SDK
+### Now that we have the Operator running, we can use it to build a Helm-based Operator using the Operator SDK framework.
 
 A few things to consider when we build this Operator.
 
