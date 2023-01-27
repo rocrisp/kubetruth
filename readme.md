@@ -141,8 +141,10 @@ operator-sdk create api \
     ````
 
    4. OLM understand files in bundle format. [Bundle Documentation](https://sdk.operatorframework.io/docs/olm-integration/generation/) so we create bundle format
-
-        make bundle
+        
+    ````
+    make bundle
+    ````
     
     [See example](https://github.com/rocrisp/kubetruth/tree/main/bundle)
 
@@ -153,7 +155,7 @@ make docker-build docker-push
 make bundle-build bundle-push
 ````
 
-8.   The extra serviceAccount is created in  kubetruth-operator-system namespace. [See example](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator-kubetruth-install-clusterrolebinding_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml#L13), so we have to install the operator in the kubetruth-operator-system namespace.
+1.   The extra serviceAccount is created in  kubetruth-operator-system namespace. [See example](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator-kubetruth-install-clusterrolebinding_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml#L13), so we have to install the operator in the kubetruth-operator-system namespace.
 
 NOTE: You can change the namespace by changing [this line](https://github.com/rocrisp/kubetruth/blob/main/config/rbac/kubetruth_install_clusterrole_binding.yaml#L12).
 
