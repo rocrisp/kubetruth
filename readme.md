@@ -65,9 +65,14 @@ oc adm policy add-scc-to-user anyuid -z kubetruth-install
 oc get pod kubetruth-install-777d7d8745-l4d7q -oyaml | grep scc
     openshift.io/scc: anyuid
 ````
-1. Examine runAsUser. Should return nothing. This means that there's no restriction on who can run the pod.
+1. Examine runAsUser.
+   
+   Should return nothing.
+   
    ````
    oc get pod kubetruth-install-777d7d8745-l4d7q -oyaml | grep runAsUser
+   ````
+   This means that there's no restriction on who can run the pod.
 
 ### We are ready to build Helm-based Operator with the Helm Chart provided by KubeTruth.
 
