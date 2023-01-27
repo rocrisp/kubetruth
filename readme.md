@@ -1,37 +1,42 @@
-### Step by step - How to convert KubeTruth K8s Operator [SourceCode](https://github.com/cloudtruth/kubetruth) to Helm-based Operator using [Operator SDK framework](https://sdk.operatorframework.io/docs/building-operators/helm/)
+## Step by step
+## How to convert KubeTruth K8s Operator [SourceCode](https://github.com/cloudtruth/kubetruth) to Helm-based Operator using [Operator SDK framework](https://sdk.operatorframework.io/docs/building-operators/helm/)
 
-Background : With as little changes to the source code, we want to convert the already functioning KubeTruth Operator written in Ruby and Helm Chart to Kubernetes Operator that works on Openshift.
+Background : We want to convert the already functioning KubeTruth Operator written in Ruby and Helm Chart to Kubernetes Operator that works on Openshift with as little changes to the source code as possible.
 
 [Click here to see how to deploy KubeTruth on Kubernetes](https://docs.cloudtruth.com/integrations/kubernetes)
 
-1. We installed the KubeTruth on Openshift 4.12. When we look at the pod, we see the status remains Error.To see why is the pod not installing we look at the log.
+1. The first thing we want to do is to make sure KubeTruth works on Openshift, so we installed it on Openshift 4.12. After installing KubeTruth we want to make sure the pod is running. However, it is not. The pod's status is Error. We can look at the Pod's log to findout why the pod is not running. 
    
 ````
 $ oc logs kubetruth-install-b8867597b-6cdqq
 Starting app
 /usr/local/lib/ruby/3.0.0/bundler/shared_helpers.rb:105:in `rescue in filesystem_access': There was an error while trying to write to `/srv/app/Gemfile.lock`. It is likely that you need to grant write permissions for that path.
 ```` 
+We see that there's a problem writing to /srv/app/Gemfile.lock
+This is a correct behavior. Openshift uses security context constraints [(SCCs)](https://docs.openshift.com/container-platform/4.12/authentication/managing-security-context-constraints.html#security-context-constraints-about_configuring-internal-oauth) to control permissions for the pods in your cluster.
+With the exception of default, kube-system, and openshift-operators, the
+ due to the SCC Openshift put on the pods.
 
-Openshift put strict SCC on pods, which means the container is run with a restricted scc
+ Openshift put strict SCC on pods, which means the container is run with a restricted scc
 
 ````
-$ oc get pod kubetruth-install-b8867597b-6cdqq -oyaml | grep scc
-    openshift.io/scc: restricted
+$ oc get pod kubetruth-install-777d7d8745-xnxhd -oyaml | grep scc
+    openshift.io/scc: restricted-v2
+````
+The pod is run with userid => 1000740000
+
+````
+$ oc get pod kubetruth-install-777d7d8745-xnxhd -oyaml | grep runAsUser
+      runAsUser: 1000740000
+````
+For a normal pod, the default SCC is set as 'restricted-v2'. 
+
+Examine the restricted-v2 :
+
+````
+oc describe scc restricted-v2
 ````
 
-This means the pod can only run with user number => 1000650000
-````
-$ oc get pod kubetruth-install-b8867597b-6cdqq -oyaml
-....
-securityContext:
-      capabilities:
-        drop:
-        - KILL
-        - MKNOD
-        - SETGID
-        - SETUID
-      runAsUser: 1000650000
-````
 
 Without having to change the container, we can get round this by adding scc policy for the serviceaccount.
 
