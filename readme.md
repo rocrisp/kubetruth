@@ -61,7 +61,7 @@ oc adm policy add-scc-to-user anyuid -z kubetruth-install
 
 4. Examine the pod and it should be running now.
 
-### Now that we have the Operator running, we can use it to build a Helm-based Operator using the Operator SDK framework.
+### The Operator running on Openshift 12. We can use the Helm Chart build a Helm-based Operator using the Operator SDK framework.
 
 A few things to consider when we build this Operator.
 
