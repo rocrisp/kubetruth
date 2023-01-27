@@ -1,4 +1,3 @@
-## Step by step
 ## How to convert KubeTruth K8s Operator [SourceCode](https://github.com/cloudtruth/kubetruth) to Helm-based Operator using [Operator SDK framework](https://sdk.operatorframework.io/docs/building-operators/helm/)
 
 Background : We want to convert the already functioning KubeTruth Operator written in Ruby and Helm Chart to Kubernetes Operator that works on Openshift with as little changes to the source code as possible.
