@@ -59,17 +59,25 @@ oc adm policy add-scc-to-user anyuid -z kubetruth-install
 
 3. Delete the offending pod and you should see a new pod spins up automatically.
 
-4. Examine the pod and it should be running now.
+4. Examine the pod status. It should be Running.
+5. Examine the scc.
+````
+oc get pod kubetruth-install-777d7d8745-l4d7q -oyaml | grep scc
+    openshift.io/scc: anyuid
+````
+6. Examine runAsUser. Nothing in return means there's no restriction on who runs the pod.
+   ````
+   oc get pod kubetruth-install-777d7d8745-l4d7q -oyaml | grep runAsUser
 
-### The Operator running on Openshift 12. We can use the Helm Chart build a Helm-based Operator using the Operator SDK framework.
+### We are ready to build Helm-based Operator with the Helm Chart provided by KubeTruth.
 
-A few things to consider when we build this Operator.
+#### A few things to consider
 
-1. The Operator has a CRD so we can create a new Kind not in conflict with the current CRD.
+1. The Operator already has a CRD so we will create a new Kind with a different name.
    
 2. We need to move the rbac from template/ to the config/rback directory
    
-3. Solve the problem with SCC. Pod permission defaulting restricted-2.
+3. We need to add SCC Pod permission using anyuid.
 
 ### Let's begin by creatinig a Helm-based operator.
 
