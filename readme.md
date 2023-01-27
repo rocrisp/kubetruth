@@ -149,13 +149,13 @@ operator-sdk create api \
     [See example](https://github.com/rocrisp/kubetruth/tree/main/bundle)
 
 
-7.   Build and push the Operator, and the Operator bundle
+7.   Build and push the Operator and the Operator bundle
 ````
 make docker-build docker-push
 make bundle-build bundle-push
 ````
 
-1.   The extra serviceAccount is created in  kubetruth-operator-system namespace. [See example](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator-kubetruth-install-clusterrolebinding_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml#L13), so we have to install the operator in the kubetruth-operator-system namespace.
+8.   The extra serviceAccount is created in  kubetruth-operator-system namespace, [see example](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator-kubetruth-install-clusterrolebinding_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml#L13), so we have to install the operator in the kubetruth-operator-system namespace.
 
 NOTE: You can change the namespace by changing [this line](https://github.com/rocrisp/kubetruth/blob/main/config/rbac/kubetruth_install_clusterrole_binding.yaml#L12).
 
@@ -164,23 +164,23 @@ Create the namespace
     oc new-project kubetruth-operator-system
     
     
-1.   Deploy the operator using Operator SDK intergration with OLM
+9.   Deploy the operator using Operator SDK intergration with OLM
    
     operator-sdk run bundle quay.io/rocrisp/kubetruth-operator-bundle:v3.0.0
     
-2.   Deploy the operand
+10.   Deploy the operand
 ````
 oc apply -f config/samples/apps_v1alpha1_kubetruth.yaml
 ````
 
-This is a handy command for when you're installing and deleting operators .
+This is a handy command for when you want to delete the operator.
 
 It will remove resources created by OLM.
 ````
 operator-sdk cleanup kubetruth-operator
 ````
 
-Also, there are times you need to modify CSV file. This command validates the syntax to make sure dot the i's and cross the t's.
+Also, there are times when you need to modify CSV file. This command validates the syntax to make sure dot the i's and cross the t's.
 ````
 operator-sdk bundle validate ./bundle
 ````
