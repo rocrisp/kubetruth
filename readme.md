@@ -108,7 +108,7 @@ operator-sdk create api \
  --kind=KubeTruth \
  --helm-chart=/Users/rosecrisp/codebase/kubetruth/helm/kubetruth
 ````
-1. Rbac and serviceAccount will be handled by OLM so we need to do the following :
+3. Rbac and serviceAccount will be handled by OLM so we need to do the following :
     
     1. Extract rbac contents from helm-charts/kubetruth/values.yaml and add them to config/rbac/role.yaml. [See Example](https://github.com/rocrisp/kubetruth/blob/main/config/rbac/role.yaml)
    
@@ -124,11 +124,11 @@ operator-sdk create api \
 
     Note: Notice the clusterrole defines SCC with anyuid which allows anyuid to access the container in the pod [See example](https://github.com/rocrisp/kubetruth/blob/main/config/rbac/kubetruth_install_clusterrole.yaml#L41)
 
-2.  Move projectmapping.yaml from helm-chart/kubetruth/crd dir to config/crd/bases/projectmapping.yaml. [See example](https://github.com/rocrisp/kubetruth/tree/main/config/crd/bases)
-3.  Modify config/crd/kustomization.yaml to include projectmapping.yaml. [See example](https://github.com/rocrisp/kubetruth/blob/main/config/crd/kustomization.yaml#L6)
-4.  Add a sample cr for ProjectMapping. [See example](https://github.com/rocrisp/kubetruth/blob/main/config/samples/apps_v1alpha1_projectmapping.yaml)
-5. Update serviceAccountName in helm-charts/kubetruth/templates/deployment.yaml to "kubetruth-operator-kubetruth-install" [See example](https://github.com/rocrisp/kubetruth/blob/main/helm-charts/kubetruth/templates/deployment.yaml#L27)
-6. Integrate with OLM to make delivering software very easy. 
+4.  Move projectmapping.yaml from helm-chart/kubetruth/crd dir to config/crd/bases/projectmapping.yaml. [See example](https://github.com/rocrisp/kubetruth/tree/main/config/crd/bases)
+5.  Modify config/crd/kustomization.yaml to include projectmapping.yaml. [See example](https://github.com/rocrisp/kubetruth/blob/main/config/crd/kustomization.yaml#L6)
+6.  Add a sample cr for ProjectMapping. [See example](https://github.com/rocrisp/kubetruth/blob/main/config/samples/apps_v1alpha1_projectmapping.yaml)
+7. Update serviceAccountName in helm-charts/kubetruth/templates/deployment.yaml to "kubetruth-operator-kubetruth-install" [See example](https://github.com/rocrisp/kubetruth/blob/main/helm-charts/kubetruth/templates/deployment.yaml#L27)
+8. Integrate with OLM to make delivering software very easy. 
 
    1. Add the extra serviceaccount to OLM by adding an extra flag --extra-servive-accounts to the Makefile [see doc](https://sdk.operatorframework.io/docs/advanced-topics/multi-sa/).
         
@@ -149,13 +149,13 @@ operator-sdk create api \
     [See example](https://github.com/rocrisp/kubetruth/tree/main/bundle)
 
 
-7.   Build and push the Operator and the Operator bundle
+9.   Build and push the Operator and the Operator bundle
 ````
 make docker-build docker-push
 make bundle-build bundle-push
 ````
 
-8.   The extra serviceAccount is created in  kubetruth-operator-system namespace, [see example](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator-kubetruth-install-clusterrolebinding_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml#L13), so we have to install the operator in the kubetruth-operator-system namespace.
+10.   The extra serviceAccount is created in  kubetruth-operator-system namespace, [see example](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator-kubetruth-install-clusterrolebinding_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml#L13), so we have to install the operator in the kubetruth-operator-system namespace.
 
 NOTE: You can change the namespace by changing [this line](https://github.com/rocrisp/kubetruth/blob/main/config/rbac/kubetruth_install_clusterrole_binding.yaml#L12).
 
@@ -164,11 +164,11 @@ Create the namespace
     oc new-project kubetruth-operator-system
     
     
-9.   Deploy the operator using Operator SDK intergration with OLM
+11.   Deploy the operator using Operator SDK intergration with OLM
    
     operator-sdk run bundle quay.io/rocrisp/kubetruth-operator-bundle:v3.0.0
     
-10.   Deploy the operand
+12.   Deploy the operand
 ````
 oc apply -f config/samples/apps_v1alpha1_kubetruth.yaml
 ````
