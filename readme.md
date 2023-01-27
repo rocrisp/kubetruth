@@ -51,7 +51,7 @@ $ oc get pod kubetruth-install-b8867597b-6cdqq -oyaml | grep serviceAccountName
   serviceAccountName: kubetruth-install
 ````
 
-1. Use this command to change scc from restricted-v2 to anyuid 
+1. Use this command to add anyuid to scc 
 
 ````
 oc adm policy add-scc-to-user anyuid -z kubetruth-install
