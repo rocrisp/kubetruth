@@ -51,13 +51,13 @@ $ oc get pod kubetruth-install-b8867597b-6cdqq -oyaml | grep serviceAccountName
   serviceAccountName: kubetruth-install
 ````
 
-1. Use this command to add anyuid to scc 
+2. Use this command to add anyuid to scc 
 
 ````
 oc adm policy add-scc-to-user anyuid -z kubetruth-install
 ````
 
-Delete the offending pod and you should see a new pod spins up automatically.
+3. Delete the offending pod and you should see a new pod spins up automatically.
 
 Examine the pod and it should be running now.
 
