@@ -42,7 +42,7 @@ $ oc get pod kubetruth-install-777d7d8745-xnxhd -oyaml | grep runAsUser
       runAsUser: 1000740000
 ````
 
-To fix this, without having to change the container's permission, we can add scc policy for the serviceaccount.
+To fix this without making changes to the container's permission, we cadd scc policy for the serviceaccount.
 
 1. Find out pod's ServiceAccountName
 
