@@ -10,7 +10,7 @@ Follow the direction from [here](https://docs.cloudtruth.com/integrations/kubern
 
 After installing KubeTruth we see the pod is not running with Error status. 
 
-So we look at the Pod's log for more info. 
+The Pod's log can offer for more info. 
    
 ````
 $ oc logs kubetruth-install-b8867597b-6cdqq
