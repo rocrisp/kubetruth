@@ -57,11 +57,11 @@ $ oc get pod kubetruth-install-b8867597b-6cdqq -oyaml | grep serviceAccountName
 oc adm policy add-scc-to-user anyuid -z kubetruth-install
 ````
 
-Deleting the offending pod and see a new pod  spins up automatically.
+Delete the offending pod and you should see a new pod spins up automatically.
 
-Examine the pod and it should be running.
+Examine the pod and it should be running now.
 
-### So now that we have the Operator running, we can use what we already have and build onto it.
+### Now that we have the Operator running, we can use it to build a Helm-based Operator using Operator SDK
 
 A few things to consider when we build this Operator.
 
