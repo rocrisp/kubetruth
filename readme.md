@@ -128,52 +128,56 @@ operator-sdk create api \
 5.  Modify config/crd/kustomization.yaml to include projectmapping.yaml. [See example](https://github.com/rocrisp/kubetruth/blob/main/config/crd/kustomization.yaml#L6)
 6.  Add a sample cr for ProjectMapping. [See example](https://github.com/rocrisp/kubetruth/blob/main/config/samples/apps_v1alpha1_projectmapping.yaml)
 7. Update serviceAccountName in helm-charts/kubetruth/templates/deployment.yaml to "kubetruth-operator-kubetruth-install" [See example](https://github.com/rocrisp/kubetruth/blob/main/helm-charts/kubetruth/templates/deployment.yaml#L27)
-8. Integrate with OLM to make delivering software very easy. 
+8. Configure Operator's image registry by modifying the Makefile.
+   ````
+   VERSION ?= 0.0.1
+   IMAGE_TAG_BASE ?= quay.io/placeholder/kubetruth
+   IMG ?= $(IMAGE_TAG_BASE):$(VERSION)
+   ````
 
-   1. Add the extra serviceaccount to OLM by adding an extra flag --extra-servive-accounts to the Makefile [see doc](https://sdk.operatorframework.io/docs/advanced-topics/multi-sa/).
+9. Once done, The following command will build and push an operator image tagged as quay.io/placeholder/kubetruth-operator:v0.0.1
+   ````
+   make docker-build docker-push
+   ````
+10. Integrate with OLM to make delivering software very easy. 
+
+   * Add the extra serviceaccount to OLM by adding an extra flag --extra-servive-accounts to the Makefile [see doc](https://sdk.operatorframework.io/docs/advanced-topics/multi-sa/).
         
         [See example](https://github.com/rocrisp/kubetruth/blob/main/Makefile#L157)
    
-   2. Makefile depends on environment variables. To make things easier use setenv.sh. [See example](https://github.com/rocrisp/kubetruth/blob/main/setenv.sh)
-   3.  Modify and execute setenv.sh with
-    ````
-    source setenv.sh
-    ````
-
-   4. OLM understand files in bundle format. [Bundle Documentation](https://sdk.operatorframework.io/docs/olm-integration/generation/) so we create bundle format
-        
-    ````
-    make bundle
-    ````
-    
-    [See example](https://github.com/rocrisp/kubetruth/tree/main/bundle)
-
-
-9.   Build and push the Operator and the Operator bundle
-````
-make docker-build docker-push
-make bundle-build bundle-push
-````
-
-10.   The extra serviceAccount is created in  kubetruth-operator-system namespace, [see example](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator-kubetruth-install-clusterrolebinding_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml#L13), so we have to install the operator in the kubetruth-operator-system namespace.
-
-NOTE: You can change the namespace by changing [this line](https://github.com/rocrisp/kubetruth/blob/main/config/rbac/kubetruth_install_clusterrole_binding.yaml#L12).
-
-Create the namespace
-
-    oc new-project kubetruth-operator-system
-    
-    
-11.   Deploy the operator using Operator SDK intergration with OLM
+   * OLM works with files in bundle format. [Bundle Documentation](https://sdk.operatorframework.io/docs/olm-integration/generation/), so the following command bundles your operator
+      ````
+      make bundle
+      ````
+     [See example](https://github.com/rocrisp/kubetruth/tree/main/bundle)
    
-    operator-sdk run bundle quay.io/rocrisp/kubetruth-operator-bundle:v3.0.0
-    
-12.   Deploy the operand
-````
-oc apply -f config/samples/apps_v1alpha1_kubetruth.yaml
-````
+   * Build and push the Operator bundle
+     ````
+     make bundle-build bundle-push
+     ````
+   * The extra serviceAccount is created in  kubetruth-operator-system namespace, [see example](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator-kubetruth-install-clusterrolebinding_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml#L13), so we have to install the operator in the kubetruth-operator-system namespace.
 
-This is a handy command for when you want to delete the operator.
+     NOTE: You can change the namespace by changing [this line](https://github.com/rocrisp/kubetruth/blob/main/config/rbac/kubetruth_install_clusterrole_binding.yaml#L12).
+
+ *   Create kubetruth-operator-system namespace
+      ````
+      oc new-project kubetruth-operator-system
+      ```` 
+    
+ *  Deploy the operator using Operator SDK intergration with OLM
+     ````
+     operator-sdk run bundle quay.io/rocrisp/kubetruth-operator-bundle:v3.0.0
+     ````
+    
+ *  Deploy the operand
+    ````
+    oc apply -f config/samples/apps_v1alpha1_kubetruth.yaml
+    ````
+
+### End
+
+### Freebies
+Here is a handy command for when you want to delete the operator.
 
 It will remove resources created by OLM.
 ````
