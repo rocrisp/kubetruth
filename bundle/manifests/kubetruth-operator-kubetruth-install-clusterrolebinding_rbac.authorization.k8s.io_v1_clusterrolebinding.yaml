@@ -9,5 +9,5 @@ roleRef:
   name: kubetruth-operator-kubetruth-install-clusterrole
 subjects:
 - kind: ServiceAccount
-  name: kubetruth-operator-kubetruth-install
-  namespace: kubetruth-operator-system
+  name: kubetruth
+  namespace: kubetruth

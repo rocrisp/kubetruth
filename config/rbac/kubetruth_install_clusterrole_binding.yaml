@@ -8,5 +8,5 @@ roleRef:
   name: kubetruth-install-clusterrole
 subjects:
 - kind: ServiceAccount
-  name: kubetruth-install
+  name: kubetruth
   namespace: system

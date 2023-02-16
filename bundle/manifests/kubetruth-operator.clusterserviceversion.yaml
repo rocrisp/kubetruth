@@ -8,63 +8,12 @@ metadata:
           "apiVersion": "apps.cloudtruth.com/v1alpha1",
           "kind": "KubeTruth",
           "metadata": {
-            "name": "kubetruth-sample"
+            "name": "kubetruth-sample-short"
           },
           "spec": {
             "affinity": {},
             "appSettings": {
-              "apiKey": "832guQjd.nMpEZa2Xuvup2W2usCOtnGh83RUASFOZ",
-              "apiUrl": null,
-              "async": true,
-              "debug": false,
-              "pollingInterval": null
-            },
-            "autoscaling": {
-              "enabled": false,
-              "maxReplicas": 100,
-              "minReplicas": 1,
-              "targetCPUUtilizationPercentage": 80
-            },
-            "fullnameOverride": "",
-            "image": {
-              "pullPolicy": "Always",
-              "repository": "cloudtruth/kubetruth",
-              "tag": ""
-            },
-            "imagePullSecrets": [],
-            "nameOverride": "",
-            "nodeSelector": {},
-            "podAnnotations": {},
-            "podSecurityContext": {},
-            "projectMappings": {
-              "root": {
-                "context": {
-                  "resource_name": "{{ project | dns_safe }}",
-                  "resource_namespace": "{{ mapping_namespace }}",
-                  "skip_secrets": false
-                },
-                "environment": "default",
-                "project_selector": "^(?!kubetruth)",
-                "resource_templates": {
-                  "configmap": "{%- if parameters.size \u003e 0 %}\napiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: \"{{ context.resource_name }}\"\n  namespace: \"{{ context.resource_namespace }}\"\n  labels:\n    version: \"{{ parameters | sort | to_json | sha256 | slice: 0, 7 }}\"\n  annotations:\n    kubetruth/project_heirarchy: |\n      {{ project_heirarchy | to_yaml | indent: 6 | lstrip }}\n    kubetruth/parameter_origins: |\n      {{ parameter_origins | to_yaml | indent: 6 | lstrip }}\ndata:\n  {%- for parameter in parameters %}\n  {{ parameter[0] | key_safe | stringify }}: {{ parameter[1] | stringify }}\n  {%- endfor %}\n{%- endif %}\n",
-                  "secret": "{%- unless context.skip_secrets or secrets.size == 0 %}\napiVersion: v1\nkind: Secret\nmetadata:\n  name: \"{{ context.resource_name }}\"\n  namespace: \"{{ context.resource_namespace }}\"\n  labels:\n    version: \"{{ secrets | sort | to_json | sha256 | slice: 0, 7 }}\"\n  annotations:\n    kubetruth/project_heirarchy: |\n      {{ project_heirarchy | to_yaml | indent: 6 | lstrip }}\n    kubetruth/parameter_origins: |\n      {{ secret_origins | to_yaml | indent: 6 | lstrip }}\ndata:\n  {%- for secret in secrets %}\n  {{ secret[0] | key_safe | stringify }}: {{ secret[1] | encode64 | stringify }}\n  {%- endfor %}\n{%- endunless %}\n"
-                },
-                "scope": "root"
-              },
-              "webcontrol": {
-                "project_selector": "^kubetruth$",
-                "resource_templates": {
-                  "crds": "{%- for template in templates.names %}\n\n{%- assign is_raw_template = templates[template] | re_contains: \"^\\s*#\\~\\s*format:\\s*raw\" %}\n{%- if is_raw_template %}\n\n{{ templates[template] }}\n\n{%- else %}\n\n{%- assign name_parts = template | split: \"/\" %}\n{%- assign name = name_parts | last %}\n\napiVersion: kubetruth.cloudtruth.com/v1\nkind: ProjectMapping\nmetadata:\n  name: \"{{ name }}\"\n  {%- if name_parts.size \u003e 1 %}\n  namespace: \"{{ name_parts | first }}\"\n  {%- endif %}\n\nspec: {{ templates[template] | nindent: 2 }}\n\n{%- endif %}\n\n{% unless forloop.last %}---{% endunless %}\n{%- endfor %}\n"
-                },
-                "scope": "override",
-                "skip": true,
-                "suppress_namespace_inheritance": true
-              }
-            },
-            "replicaCount": 1,
-            "secret": {
-              "create": true,
-              "name": ""
+              "apiKey": "832guQjd.nMpEZa2Xuvup2W2usCOtnGh83RUASFOZ"
             }
           }
         }
@@ -72,7 +21,7 @@ metadata:
     capabilities: Basic Install
     operators.operatorframework.io/builder: operator-sdk-v1.25.2
     operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
-  name: kubetruth-operator.v3.0.0
+  name: kubetruth-operator.v3.1.2
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -131,6 +80,7 @@ spec:
           - pods
           - services
           - services/finalizers
+          - serviceaccounts
           - endpoints
           - persistentvolumeclaims
           - events
@@ -260,7 +210,7 @@ spec:
                 - --metrics-bind-address=127.0.0.1:8080
                 - --leader-elect
                 - --leader-election-id=kubetruth-operator
-                image: quay.io/rocrisp/kubetruth-operator:v3.0.0
+                image: quay.io/rocrisp/kubetruth-operator:3.1.2
                 livenessProbe:
                   httpGet:
                     path: /healthz
@@ -348,4 +298,4 @@ spec:
   maturity: alpha
   provider:
     name: kubetruth for cloudtruth
-  version: 3.0.0
+  version: 3.1.2

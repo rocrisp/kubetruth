@@ -51,6 +51,17 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
+Create the name of the service account to use
+*/}}
+{{- define "kubetruth.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "kubetruth.fullname" .) .Values.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.name }}
+{{- end }}
+{{- end }}
+
+{{/*
 Get the secret name
 */}}
 {{- define "kubetruth.secretName" -}}
