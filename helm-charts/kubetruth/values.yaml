@@ -14,15 +14,6 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
-serviceAccount:
-  # Specifies whether a service account should be created
-  create: true
-  # Annotations to add to the service account
-  annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name: "kubetruth"
-
 # rbac:
 #   # Specifies whether RBAC resources should be created
 #   create: true
@@ -53,6 +44,8 @@ securityContext:
   #   - ALL
   # runAsNonRoot: true
   # runAsUser: 1000
+  seccompProfile:
+    type: RuntimeDefault
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
