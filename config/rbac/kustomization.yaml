@@ -16,7 +16,7 @@ resources:
 - auth_proxy_role.yaml
 - auth_proxy_role_binding.yaml
 - auth_proxy_client_clusterrole.yaml
-# Add kubetruth-install serviceaccount
-- kubetruth_install_serviceaccount.yaml
-- kubetruth_install_clusterrole.yaml
-- kubetruth_install_clusterrole_binding.yaml
+# Add extra serviceaccount
+- additional_serviceaccount.yaml
+- additional_clusterrole.yaml
+- additional_clusterrole_binding.yaml

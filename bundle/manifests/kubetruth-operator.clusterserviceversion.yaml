@@ -226,11 +226,11 @@ spec:
                   periodSeconds: 10
                 resources:
                   limits:
-                    cpu: 200m
-                    memory: 400Mi
+                    cpu: 500m
+                    memory: 128Mi
                   requests:
-                    cpu: 200m
-                    memory: 400Mi
+                    cpu: 10m
+                    memory: 64Mi
                 securityContext:
                   allowPrivilegeEscalation: false
                   capabilities:
