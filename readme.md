@@ -1,12 +1,14 @@
 ## How to convert KubeTruth K8s Operator to Helm-based Operator using the [Operator SDK - Operator framework](https://sdk.operatorframework.io/docs/building-operators/helm/)
 
-### We want to convert the KubeTruth Operator written in Ruby and Helm Chart to Kubernetes Operator that will work on Openshift 4.12, and with as little changes to the source code as possible.
+### Our objective is to migrate the KubeTruth Operator, which was initially built using Ruby and Helm Chart, into a Kubernetes Operator that is compatible with Openshift 4.12, while keeping the required changes to the source code to a minimum.
 
-### First, we want make sure KubeTruth works on Openshift 4.12.
+### First, our goal is to ensure that KubeTruth is functional on Openshift 4.12.
 
 Follow directions [in here](https://docs.cloudtruth.com/integrations/kubernetes) to install KubeTruth on Openshift 4.12.
 
-After KubeTruth installed on Openshift 4.12, we see the pod is not running, and it has a Error status. 
+* This is no longer occurring due to an update in the configuration of the container. Proceed to the section on [Building the operator](#BuildingOperator).
+  
+After KubeTruth installed on Openshift 4.12, we see the pod is not running, and it has a Error status.
 
 The Pod's log offers insight into what's happening with the container. 
    
@@ -51,7 +53,7 @@ $ oc get pod kubetruth-install-b8867597b-6cdqq -oyaml | grep serviceAccountName
   serviceAccountName: kubetruth-install
 ````
 
-2. Add anyuid to kubetruth-install serviceaccount 
+2. Add anyuid to kubetruth-install serviceaccount
 
 ````
 oc adm policy add-scc-to-user anyuid -z kubetruth-install
@@ -74,102 +76,102 @@ oc get pod kubetruth-install-777d7d8745-l4d7q -oyaml | grep scc
    ````
    This means that there's no restriction on who can read/write containers in the pod.
 
-### Now that we have that worked out, we are ready to build Helm-based Operator with the Helm Chart provided by KubeTruth.
+Having resolved that matter, we can now proceed to construct a Helm-based Operator using the Helm Chart supplied by KubeTruth.
 
-[KubeTruth Operator source code](https://github.com/cloudtruth/kubetruth)
+## <a id="BuildingOperator"></a>Building Operator
 
-#### Before we begin, there are a few things to consider
+[For reference, this is the KubeTruth Operator repo](https://github.com/cloudtruth/kubetruth)
 
-1. The Operator already have a custom Kind associated with the Ruby Operator, so we will create a new Kind with a different name.
+#### Prior to starting, there are some factors to take into account.
+
+1. As the Ruby Operator already has a custom Kind associated with it, we'll need to create a new Kind with a distinct name.
    
-2. We want to extract any rbac, serviceaccount from the helm charts because OLM handles all rbac.
+2. Our goal is to remove any rbac and serviceaccount resources from the helm charts, as OLM manages all rbac resources.
    
-3. We need to add anyuid to the clusterrole and bind that to the serviceaccount that we will create.
+~~3. It is necessary to include anyuid in the clusterrole and then assign it to the serviceaccount we'll be generating.~~
 
 
-### Let's begin by creatinig a Helm-based operator.
+#### Create a new project.
 
-1. Initialize a Helm Project
+1. Create a Helm project called "kubetruth-operator"
 ````
+mkdir kubetruth-operator
 operator-sdk init --domain cloudtruth.com --plugins helm
 ````
 2. Create the API.
+   
+   This creates the kubetruth-operator project for watching the KubeTruth resource.
 
-   Group : apps
-
-   Version : v1alpha1
-
-   Kind : KubeTruth
-
-   Fetch the Helm chart from my local disk
 ````
 operator-sdk create api \
  --group=apps --version=v1alpha1 \
  --kind=KubeTruth \
  --helm-chart=/Users/rosecrisp/codebase/kubetruth/helm/kubetruth
 ````
-3. Rbac and serviceAccount will be handled by OLM so we need to do the following :
+   Note: Fetch the Helm chart from my local disk
+
+2. Rbac and serviceAccount will be handled by OLM so we need to do the following :
     
-    1. Extract rbac contents from helm-charts/kubetruth/values.yaml and add them to config/rbac/role.yaml. [See Example](https://github.com/rocrisp/kubetruth/blob/main/config/rbac/role.yaml)
+    1. Extract rbac contents from [helm-charts/kubetruth/values.yaml](https://github.com/rocrisp/kubetruth/blob/main/helm-charts/kubetruth/values.yaml#L26) and add them to config/rbac/role.yaml. [See Example](https://github.com/rocrisp/kubetruth/blob/main/config/rbac/role.yaml#L83)
    
-    2. Remove serviceAccount contents from helm-charts/kubetruth/values.yaml.
+    2. Since we'll be generating a new ServiceAccount, please delete serviceaccount from [helm-charts/kubetruth/values.yaml](https://github.com/rocrisp/kubetruth/blob/main/helm-charts/kubetruth/values.yaml#L17)
+    
    
-        [See example](https://github.com/rocrisp/kubetruth/blob/main/helm-charts/kubetruth/values.yaml) 
+    3. To enable OLM, extract clusterrole.yaml, clusterrolebinding.yaml, role.yaml, rolebinding.yaml, and serviceaccount.yaml from helm-charts/kubetruth/templates dir (https://github.com/rocrisp/kubetruth/tree/main/helm-charts/kubetruth/templates)
    
-    3. Remove clusterrole.yaml, clusterrolebinding.yaml, role.yaml, rolebinding.yaml, and serviceaccount.yaml from helm-charts/kubetruth/templates dir [See example](https://github.com/rocrisp/kubetruth/tree/main/helm-charts/kubetruth/templates)
-   
-    4. Create serviceaccount.yaml, clusterrole.yaml, and clusterrolebinding.yaml in the config/rbac dir [See example](https://github.com/rocrisp/kubetruth/tree/main/config/rbac)
+    4. and add additional_serviceaccount.yaml, additional_clusterrole.yaml, and additional_clusterrole_binding.yaml files in the config/rbac directory.[See example](https://github.com/rocrisp/kubetruth/tree/main/config/rbac)
 
     5. Modify config/rbac/kustomization.yaml to include the files created in (iv). [See example](https://github.com/rocrisp/kubetruth/blob/main/config/rbac/kustomization.yaml#L20)
 
-    Note: Notice the clusterrole defines SCC with anyuid which allows anyuid to access the container in the pod [See example](https://github.com/rocrisp/kubetruth/blob/main/config/rbac/kubetruth_install_clusterrole.yaml#L41)
+    ~~Note: Notice the clusterrole defines SCC with anyuid which allows anyuid to access the container in the pod [See example](https://github.com/rocrisp/kubetruth/blob/main/config/rbac/kubetruth_install_clusterrole.yaml#L41)~~
 
-4.  Move projectmapping.yaml from helm-chart/kubetruth/crd dir to config/crd/bases/projectmapping.yaml. [See example](https://github.com/rocrisp/kubetruth/tree/main/config/crd/bases)
-5.  Modify config/crd/kustomization.yaml to include projectmapping.yaml. [See example](https://github.com/rocrisp/kubetruth/blob/main/config/crd/kustomization.yaml#L6)
-6.  Add a sample cr for ProjectMapping. [See example](https://github.com/rocrisp/kubetruth/blob/main/config/samples/apps_v1alpha1_projectmapping.yaml)
-7. Update serviceAccountName in helm-charts/kubetruth/templates/deployment.yaml to "kubetruth-operator-kubetruth-install" [See example](https://github.com/rocrisp/kubetruth/blob/main/helm-charts/kubetruth/templates/deployment.yaml#L27)
-8. Configure Operator's image registry by modifying the Makefile.
+3.  Move projectmapping.yaml from helm-chart/kubetruth/crd dir to config/crd/bases/projectmapping.yaml. [See example](https://github.com/rocrisp/kubetruth/tree/main/config/crd/bases)
+4.  Modify config/crd/kustomization.yaml to include projectmapping.yaml. [See example](https://github.com/rocrisp/kubetruth/blob/main/config/crd/kustomization.yaml#L6)
+5.  Add a sample cr for ProjectMapping. [See example](https://github.com/rocrisp/kubetruth/blob/main/config/samples/apps_v1alpha1_projectmapping.yaml)
+6. To use the new serviceaccount generated by OLM, modify the serviceAccountName field in helm-charts/kubetruth/templates/deployment.yaml. to "kubetruth-operator-additional-service-account" [See example](https://github.com/rocrisp/kubetruth/blob/main/helm-charts/kubetruth/templates/deployment.yaml#L27)
+7. To maximize the benefits of the Makefile, adjust the Makefile to set up the image registry for the Operator and version
    ````
    VERSION ?= 0.0.1
    IMAGE_TAG_BASE ?= quay.io/placeholder/kubetruth
    IMG ?= $(IMAGE_TAG_BASE):$(VERSION)
    ````
 
-9. Once done, The following command will build and push an operator image tagged as quay.io/placeholder/kubetruth-operator:v0.0.1
+8. Once completed, the subsequent command will build and upload an operator image labeled as quay.io/placeholder/kubetruth-operator:v0.0.1.
    ````
    make docker-build docker-push
    ````
-10. Integrate with OLM to make delivering software very easy. 
+9.  Associate the serviceaccount with OLM. 
 
-   * Add the extra serviceaccount to OLM by adding an extra flag --extra-servive-accounts to the Makefile [see doc](https://sdk.operatorframework.io/docs/advanced-topics/multi-sa/).
+   * Add extra flag --extra-servive-accounts to the Makefile [see doc](https://sdk.operatorframework.io/docs/advanced-topics/multi-sa/).
         
-        [See example](https://github.com/rocrisp/kubetruth/blob/main/Makefile#L157)
+        [See example](https://github.com/rocrisp/kubetruth/blob/main/Makefile#L162)
    
-   * OLM works with files in bundle format. [Bundle Documentation](https://sdk.operatorframework.io/docs/olm-integration/generation/), so the following command bundles your operator
+   * The subsequent command generates a bundle that OLM can utilize to install the operator. [Bundle Documentation](https://sdk.operatorframework.io/docs/olm-integration/generation/), so the following command bundles your operator
       ````
       make bundle
       ````
      [See example](https://github.com/rocrisp/kubetruth/tree/main/bundle)
    
-   * Build and push the Operator bundle
+   * Build and push the Operator bundle image
      ````
      make bundle-build bundle-push
      ````
-   * The extra serviceAccount is created in  kubetruth-operator-system namespace, [see example](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator-kubetruth-install-clusterrolebinding_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml#L13), so we have to install the operator in the kubetruth-operator-system namespace.
+   * As the additional serviceAccount is created in  kubetruth namespace, [see example](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator-extra-clusterrolebinding_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml#L13), we must install the operator in the kubetruth namespace.
 
-     NOTE: You can change the namespace by changing [this line](https://github.com/rocrisp/kubetruth/blob/main/config/rbac/kubetruth_install_clusterrole_binding.yaml#L12).
+     NOTE: You can modify the namespace by editing [this line](https://github.com/rocrisp/kubetruth/blob/main/config/default/kustomization.yaml#L2).
 
- *   Create kubetruth-operator-system namespace
+### Deploy the Kubetruth operator in the cluster
+ *   Generate a namespace named kubetruth
       ````
-      oc new-project kubetruth-operator-system
+      oc new-project kubetruth
       ```` 
     
- *  Deploy the operator using Operator SDK intergration with OLM
+ *  Install the operator utilizing Operator SDK integration with OLM.
      ````
      operator-sdk run bundle quay.io/rocrisp/kubetruth-operator-bundle:v3.0.0
      ````
     
- *  Deploy the operand
+ *  Install the operand
     ````
     oc apply -f config/samples/apps_v1alpha1_kubetruth.yaml
     ````
@@ -177,14 +179,12 @@ operator-sdk create api \
 ### End
 
 ### Freebies
-Here is a handy command for when you want to delete the operator.
 
-It will remove resources created by OLM.
+This command will delete the resources generated by OLM for the kubetruth-operator installation
 ````
 operator-sdk cleanup kubetruth-operator
 ````
-
-Also, there are times when you need to modify CSV file. This command validates the syntax to make sure dot the i's and cross the t's.
+Additionally, on occasions where you need to edit the CSV file, this command verifies the syntax to ensure that all details are correct
 ````
 operator-sdk bundle validate ./bundle
 ````
