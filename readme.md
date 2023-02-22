@@ -143,8 +143,9 @@ operator-sdk create api \
    $(KUSTOMIZE) build config/manifests | operator-sdk generate bundle -q --overwrite --extra-service-accounts additional-service-account $(BUNDLE_GEN_FLAGS)
 	operator-sdk bundle validate ./bundle
    ````
-   
+
    [See example](https://github.com/rocrisp/kubetruth/blob/main/Makefile#L162)
+
    [Doc reference](https://sdk.operatorframework.io/docs/advanced-topics/multi-sa/)
 
 9. Once completed, the subsequent command will build and upload an operator image labeled as quay.io/placeholder/kubetruth-operator:v0.0.1.
@@ -153,20 +154,24 @@ operator-sdk create api \
    ````
    
 10. The subsequent command generates a bundle that OLM can utilize to install the operator. [Bundle Documentation](https://sdk.operatorframework.io/docs/olm-integration/generation/), so the following command bundles your operator
-````
-make bundle
-````
-[See example](https://github.com/rocrisp/kubetruth/tree/main/bundle)
+    ````
+    make bundle
+    ````
+   [See example](https://github.com/rocrisp/kubetruth/tree/main/bundle)
    
-1.  Build and push the Operator bundle image
-````
-make bundle-build bundle-push
-````
-1.  As the additional serviceAccount is created in  kubetruth namespace, [see example](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator-extra-clusterrolebinding_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml#L13), we must install the operator in the kubetruth namespace.
 
-NOTE: You can modify the namespace by editing [this line](https://github.com/rocrisp/kubetruth/blob/main/config/default/kustomization.yaml#L2).
+11. Build and push the Operator bundle image
+    ````
+    make bundle-build bundle-push
+    ```` 
 
 ### Deploy the Kubetruth operator in the cluster
+
+* As the additional serviceAccount is created in  kubetruth namespace, [see example](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator-extra-clusterrolebinding_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml#L13), we must install the operator in the kubetruth namespace.
+
+    NOTE: You can modify the namespace by editing [this line](https://github.com/rocrisp/kubetruth/blob/main/config/default/kustomization.yaml#L2).
+
+
 1   Generate a namespace named kubetruth
       ````
       oc new-project kubetruth
