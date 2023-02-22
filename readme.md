@@ -80,7 +80,9 @@ Having resolved that matter, we can now proceed to construct a Helm-based Operat
 
 ## <a id="BuildingOperator"></a>Building Operator
 
-[Here](https://github.com/cloudtruth/kubetruth) is the repository for the KubeTruth Operator, for your reference.
+Please find the KubeTruth Operator repository below, for your reference:
+
+[Repository link](https://github.com/cloudtruth/kubetruth)
 
 #### Prior to starting, there are some factors to take into account.
 
