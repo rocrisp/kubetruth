@@ -173,17 +173,20 @@ operator-sdk create api \
 * You can modify the namespace by editing [this line](https://github.com/rocrisp/kubetruth/blob/main/config/default/kustomization.yaml#L2).
 
 
+
 1   Generate a namespace named kubetruth
       ````
       oc new-project kubetruth
       ```` 
     
 2  Install the operator utilizing Operator SDK integration with OLM.
+
      ````
      operator-sdk run bundle quay.io/rocrisp/kubetruth-operator-bundle:v3.0.0
      ````
     
 3  Install the operand
+
     ````
     oc apply -f config/samples/apps_v1alpha1_kubetruth.yaml
     ````
