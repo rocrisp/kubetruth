@@ -132,7 +132,7 @@ operator-sdk create api \
    
    * Include the image registry, image name, and version in the Makefile
    ````
-   VERSION ?= 0.0.1
+   VERSION ?= 3.0.0
    IMAGE_TAG_BASE ?= quay.io/placeholder/kubetruth
    IMG ?= $(IMAGE_TAG_BASE):$(VERSION)
    ````
@@ -148,7 +148,7 @@ operator-sdk create api \
 
    [Doc reference](https://sdk.operatorframework.io/docs/advanced-topics/multi-sa/)
 
-9. Once completed, the subsequent command will build and upload an operator image labeled as quay.io/placeholder/kubetruth-operator:v0.0.1.
+9. Once completed, the subsequent command will build and upload an operator image labeled as quay.io/placeholder/kubetruth-operator:v3.0.0.
    ````
    make docker-build docker-push
    ````
@@ -161,7 +161,7 @@ operator-sdk create api \
     [See example](https://github.com/rocrisp/kubetruth/tree/main/bundle)
    
 
-11. Build and push the Operator bundle image
+11. Build and push the Operator bundle image to quay.io/rocrisp/kubetruth-operator-bundle:v3.0.0
     ````
     make bundle-build bundle-push
     ```` 
