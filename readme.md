@@ -157,7 +157,8 @@ operator-sdk create api \
     ````
     make bundle
     ````
-   [See example](https://github.com/rocrisp/kubetruth/tree/main/bundle)
+    
+    [See example](https://github.com/rocrisp/kubetruth/tree/main/bundle)
    
 
 11. Build and push the Operator bundle image
@@ -169,7 +170,7 @@ operator-sdk create api \
 
 * As the additional serviceAccount is created in  kubetruth namespace, [see example](https://github.com/rocrisp/kubetruth/blob/main/bundle/manifests/kubetruth-operator-extra-clusterrolebinding_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml#L13), we must install the operator in the kubetruth namespace.
 
-    NOTE: You can modify the namespace by editing [this line](https://github.com/rocrisp/kubetruth/blob/main/config/default/kustomization.yaml#L2).
+* You can modify the namespace by editing [this line](https://github.com/rocrisp/kubetruth/blob/main/config/default/kustomization.yaml#L2).
 
 
 1   Generate a namespace named kubetruth
@@ -186,8 +187,6 @@ operator-sdk create api \
     ````
     oc apply -f config/samples/apps_v1alpha1_kubetruth.yaml
     ````
-
-### End
 
 ### Freebies
 
