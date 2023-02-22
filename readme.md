@@ -8,7 +8,7 @@ Follow directions [in here](https://docs.cloudtruth.com/integrations/kubernetes)
   
 After KubeTruth installed on Openshift 4.12, we see the pod is not running, and it has a Error status.
 
-* This is no longer occurring due to an update in the configuration of the container. Proceed to the section on [Building the operator](#BuildingOperator).
+* This is no longer occurring due to an update in the configuration of the container. Proceed to the section on [Building the operator](https://github.com/rocrisp/kubetruth#building-operator).
   
 The Pod's log offers insight into what's happening with the container. 
    
