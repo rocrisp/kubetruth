@@ -2,14 +2,14 @@
 
 ### Our objective is to migrate the KubeTruth Operator, which was initially built using Ruby and Helm Chart, into a Kubernetes Operator that is compatible with Openshift 4.12, while keeping the required changes to the source code to a minimum.
 
-### First, our goal is to ensure that KubeTruth is functional on Openshift 4.12.
+### Initially, our objective is to confirm that KubeTruth operates correctly on Openshift 4.12.
 
 Follow directions [in here](https://docs.cloudtruth.com/integrations/kubernetes) to install KubeTruth on Openshift 4.12.
-
-* This is no longer occurring due to an update in the configuration of the container. Proceed to the section on [Building the operator](#BuildingOperator).
   
 After KubeTruth installed on Openshift 4.12, we see the pod is not running, and it has a Error status.
 
+* This is no longer occurring due to an update in the configuration of the container. Proceed to the section on [Building the operator](#BuildingOperator).
+  
 The Pod's log offers insight into what's happening with the container. 
    
 ````
