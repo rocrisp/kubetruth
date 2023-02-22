@@ -141,9 +141,14 @@ operator-sdk create api \
    ````
 9.  Associate the serviceaccount with OLM. 
 
-   * Add extra flag --extra-servive-accounts to the Makefile [see doc](https://sdk.operatorframework.io/docs/advanced-topics/multi-sa/).
+   * Add extra flag --extra-servive-accounts Makefile, bundle section:
+   ''''
+   $(KUSTOMIZE) build config/manifests | operator-sdk generate bundle -q --overwrite --extra-service-accounts additional-service-account $(BUNDLE_GEN_FLAGS)
+	operator-sdk bundle validate ./bundle
+   ''''
         
-        [See example](https://github.com/rocrisp/kubetruth/blob/main/Makefile#L162)
+    [See example](https://github.com/rocrisp/kubetruth/blob/main/Makefile#L162)
+    [Doc reference](https://sdk.operatorframework.io/docs/advanced-topics/multi-sa/).
    
    * The subsequent command generates a bundle that OLM can utilize to install the operator. [Bundle Documentation](https://sdk.operatorframework.io/docs/olm-integration/generation/), so the following command bundles your operator
       ````
